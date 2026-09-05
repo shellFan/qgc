@@ -1,0 +1,723 @@
+[INFO] Scanning for projects...
+[INFO] ------------------------------------------------------------------------
+[INFO] Reactor Build Order:
+[INFO] 
+[INFO] qgc-common
+[INFO] qgc-core
+[INFO] qgc-user
+[INFO] qgc-campaign
+[INFO] qgc-payment
+[INFO] qgc-wallet
+[INFO] qgc-content
+[INFO] qgc-server
+[INFO] qgc-wechat
+[INFO] qgc-admin
+[INFO] qgc-job
+[INFO] qgc-server-main
+[INFO]                                                                         
+[INFO] ------------------------------------------------------------------------
+[INFO] Building qgc-common 1.0.0
+[INFO] ------------------------------------------------------------------------
+[INFO] 
+[INFO] --- maven-resources-plugin:3.2.0:resources (default-resources) @ qgc-common ---
+[INFO] Using 'UTF-8' encoding to copy filtered resources.
+[INFO] Using 'UTF-8' encoding to copy filtered properties files.
+[INFO] skip non existing resourceDirectory D:\git\fan\aixm\qgc\qgc\qgc-server\qgc-common\src\main\resources
+[INFO] skip non existing resourceDirectory D:\git\fan\aixm\qgc\qgc\qgc-server\qgc-common\src\main\resources
+[INFO] 
+[INFO] --- maven-compiler-plugin:3.10.1:compile (default-compile) @ qgc-common ---
+[INFO] Nothing to compile - all classes are up to date
+[INFO]                                                                         
+[INFO] ------------------------------------------------------------------------
+[INFO] Building qgc-core 1.0.0
+[INFO] ------------------------------------------------------------------------
+[INFO] 
+[INFO] --- maven-resources-plugin:3.2.0:resources (default-resources) @ qgc-core ---
+[INFO] Using 'UTF-8' encoding to copy filtered resources.
+[INFO] Using 'UTF-8' encoding to copy filtered properties files.
+[INFO] skip non existing resourceDirectory D:\git\fan\aixm\qgc\qgc\qgc-server\qgc-core\src\main\resources
+[INFO] skip non existing resourceDirectory D:\git\fan\aixm\qgc\qgc\qgc-server\qgc-core\src\main\resources
+[INFO] 
+[INFO] --- maven-compiler-plugin:3.10.1:compile (default-compile) @ qgc-core ---
+[INFO] Nothing to compile - all classes are up to date
+[INFO]                                                                         
+[INFO] ------------------------------------------------------------------------
+[INFO] Building qgc-user 1.0.0
+[INFO] ------------------------------------------------------------------------
+[INFO] 
+[INFO] --- maven-resources-plugin:3.2.0:resources (default-resources) @ qgc-user ---
+[INFO] Using 'UTF-8' encoding to copy filtered resources.
+[INFO] Using 'UTF-8' encoding to copy filtered properties files.
+[INFO] skip non existing resourceDirectory D:\git\fan\aixm\qgc\qgc\qgc-server\qgc-user\src\main\resources
+[INFO] skip non existing resourceDirectory D:\git\fan\aixm\qgc\qgc\qgc-server\qgc-user\src\main\resources
+[INFO] 
+[INFO] --- maven-compiler-plugin:3.10.1:compile (default-compile) @ qgc-user ---
+[INFO] Nothing to compile - all classes are up to date
+[INFO]                                                                         
+[INFO] ------------------------------------------------------------------------
+[INFO] Building qgc-campaign 1.0.0
+[INFO] ------------------------------------------------------------------------
+[INFO] 
+[INFO] --- maven-resources-plugin:3.2.0:resources (default-resources) @ qgc-campaign ---
+[INFO] Using 'UTF-8' encoding to copy filtered resources.
+[INFO] Using 'UTF-8' encoding to copy filtered properties files.
+[INFO] Copying 0 resource
+[INFO] Copying 1 resource
+[INFO] 
+[INFO] --- maven-compiler-plugin:3.10.1:compile (default-compile) @ qgc-campaign ---
+[INFO] Nothing to compile - all classes are up to date
+[INFO]                                                                         
+[INFO] ------------------------------------------------------------------------
+[INFO] Building qgc-payment 1.0.0
+[INFO] ------------------------------------------------------------------------
+[INFO] 
+[INFO] --- maven-resources-plugin:3.2.0:resources (default-resources) @ qgc-payment ---
+[INFO] Using 'UTF-8' encoding to copy filtered resources.
+[INFO] Using 'UTF-8' encoding to copy filtered properties files.
+[INFO] skip non existing resourceDirectory D:\git\fan\aixm\qgc\qgc\qgc-server\qgc-payment\src\main\resources
+[INFO] skip non existing resourceDirectory D:\git\fan\aixm\qgc\qgc\qgc-server\qgc-payment\src\main\resources
+[INFO] 
+[INFO] --- maven-compiler-plugin:3.10.1:compile (default-compile) @ qgc-payment ---
+[INFO] Changes detected - recompiling the module!
+[INFO] Compiling 12 source files to D:\git\fan\aixm\qgc\qgc\qgc-server\qgc-payment\target\classes
+[INFO] 某些消息已经过简化; 请使用 -Xdiags:verbose 重新编译以获得完整输出
+[INFO] -------------------------------------------------------------
+[ERROR] COMPILATION ERROR : 
+[INFO] -------------------------------------------------------------
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/config/WxPayConfig.java:[3,1] 已在该编译单元中定义com.qiongguichou.payment.config.WxPayConfig
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/controller/PaymentController.java:[49,13] 找不到符号
+  符号:   变量 log
+  位置: 类 com.qiongguichou.payment.controller.PaymentController
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/controller/PaymentController.java:[64,13] 找不到符号
+  符号:   变量 log
+  位置: 类 com.qiongguichou.payment.controller.PaymentController
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/config/WxPayConfig.java:[46,18] 找不到符号
+  符号:   方法 setAppId(java.lang.String)
+  位置: 类型为com.qiongguichou.payment.config.WxPayConfig的变量 payConfig
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/config/WxPayConfig.java:[47,18] 找不到符号
+  符号:   方法 setMchId(java.lang.String)
+  位置: 类型为com.qiongguichou.payment.config.WxPayConfig的变量 payConfig
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/config/WxPayConfig.java:[48,18] 找不到符号
+  符号:   方法 setMchKey(java.lang.String)
+  位置: 类型为com.qiongguichou.payment.config.WxPayConfig的变量 payConfig
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/config/WxPayConfig.java:[49,18] 找不到符号
+  符号:   方法 setNotifyUrl(java.lang.String)
+  位置: 类型为com.qiongguichou.payment.config.WxPayConfig的变量 payConfig
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/config/WxPayConfig.java:[50,18] 找不到符号
+  符号:   方法 setRefundNotifyUrl(java.lang.String)
+  位置: 类型为com.qiongguichou.payment.config.WxPayConfig的变量 payConfig
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/config/WxPayConfig.java:[51,18] 找不到符号
+  符号:   方法 setKeyPath(java.lang.String)
+  位置: 类型为com.qiongguichou.payment.config.WxPayConfig的变量 payConfig
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/config/WxPayConfig.java:[52,18] 找不到符号
+  符号:   方法 setTradeType(java.lang.String)
+  位置: 类型为com.qiongguichou.payment.config.WxPayConfig的变量 payConfig
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/config/WxPayConfig.java:[54,32] 不兼容的类型: com.qiongguichou.payment.config.WxPayConfig无法转换为com.github.binarywang.wxpay.config.WxPayConfig
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[69,34] 找不到符号
+  符号:   方法 getCampaignId()
+  位置: 类型为com.qiongguichou.payment.dto.PayRequest的变量 request
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[70,30] 找不到符号
+  符号:   方法 getAmount()
+  位置: 类型为com.qiongguichou.payment.dto.PayRequest的变量 request
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[79,54] 找不到符号
+  符号:   变量 SYSTEM_BUSY
+  位置: 类 com.qiongguichou.common.result.ErrorCode
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[95,54] 找不到符号
+  符号:   变量 PAY_AMOUNT_EXCEED
+  位置: 类 com.qiongguichou.common.result.ErrorCode
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[101,25] 找不到符号
+  符号:   方法 setSupportNo(java.lang.String)
+  位置: 类型为com.qiongguichou.payment.entity.SupportOrder的变量 supportOrder
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[102,25] 找不到符号
+  符号:   方法 setCampaignId(java.lang.Long)
+  位置: 类型为com.qiongguichou.payment.entity.SupportOrder的变量 supportOrder
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[103,25] 找不到符号
+  符号:   方法 setSupporterUserId(java.lang.Long)
+  位置: 类型为com.qiongguichou.payment.entity.SupportOrder的变量 supportOrder
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[104,25] 找不到符号
+  符号:   方法 setCreatorUserId(java.lang.Long)
+  位置: 类型为com.qiongguichou.payment.entity.SupportOrder的变量 supportOrder
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[105,25] 找不到符号
+  符号:   方法 setAmount(java.lang.Long)
+  位置: 类型为com.qiongguichou.payment.entity.SupportOrder的变量 supportOrder
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[106,25] 找不到符号
+  符号:   方法 setEffectiveAmount(long)
+  位置: 类型为com.qiongguichou.payment.entity.SupportOrder的变量 supportOrder
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[107,25] 找不到符号
+  符号:   方法 setRefundAmount(long)
+  位置: 类型为com.qiongguichou.payment.entity.SupportOrder的变量 supportOrder
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[108,44] 找不到符号
+  符号:   方法 getMessage()
+  位置: 类型为com.qiongguichou.payment.dto.PayRequest的变量 request
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[109,46] 找不到符号
+  符号:   方法 getAnonymous()
+  位置: 类型为com.qiongguichou.payment.dto.PayRequest的变量 request
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[109,79] 找不到符号
+  符号:   方法 getAnonymous()
+  位置: 类型为com.qiongguichou.payment.dto.PayRequest的变量 request
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[110,25] 找不到符号
+  符号:   方法 setHideAmount(int)
+  位置: 类型为com.qiongguichou.payment.entity.SupportOrder的变量 supportOrder
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[111,25] 找不到符号
+  符号:   方法 setStatus(java.lang.String)
+  位置: 类型为com.qiongguichou.payment.entity.SupportOrder的变量 supportOrder
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[116,25] 找不到符号
+  符号:   方法 setOrderNo(java.lang.String)
+  位置: 类型为com.qiongguichou.payment.entity.PaymentOrder的变量 paymentOrder
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[117,51] 找不到符号
+  符号:   方法 getSupportNo()
+  位置: 类型为com.qiongguichou.payment.entity.SupportOrder的变量 supportOrder
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[118,25] 找不到符号
+  符号:   方法 setCampaignId(java.lang.Long)
+  位置: 类型为com.qiongguichou.payment.entity.PaymentOrder的变量 paymentOrder
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[119,25] 找不到符号
+  符号:   方法 setSupporterUserId(java.lang.Long)
+  位置: 类型为com.qiongguichou.payment.entity.PaymentOrder的变量 paymentOrder
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[120,25] 找不到符号
+  符号:   方法 setCreatorUserId(java.lang.Long)
+  位置: 类型为com.qiongguichou.payment.entity.PaymentOrder的变量 paymentOrder
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[121,25] 找不到符号
+  符号:   方法 setAmount(java.lang.Long)
+  位置: 类型为com.qiongguichou.payment.entity.PaymentOrder的变量 paymentOrder
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[122,25] 找不到符号
+  符号:   方法 setEffectiveAmount(long)
+  位置: 类型为com.qiongguichou.payment.entity.PaymentOrder的变量 paymentOrder
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[123,25] 找不到符号
+  符号:   方法 setRefundAmount(long)
+  位置: 类型为com.qiongguichou.payment.entity.PaymentOrder的变量 paymentOrder
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[124,25] 找不到符号
+  符号:   方法 setTradeType(java.lang.String)
+  位置: 类型为com.qiongguichou.payment.entity.PaymentOrder的变量 paymentOrder
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[125,25] 找不到符号
+  符号:   方法 setOpenid(java.lang.String)
+  位置: 类型为com.qiongguichou.payment.entity.PaymentOrder的变量 paymentOrder
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[126,25] 找不到符号
+  符号:   方法 setStatus(java.lang.String)
+  位置: 类型为com.qiongguichou.payment.entity.PaymentOrder的变量 paymentOrder
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[131,43] 找不到符号
+  符号:   方法 getSupportNo()
+  位置: 类型为com.qiongguichou.payment.entity.SupportOrder的变量 supportOrder
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[132,50] 找不到符号
+  符号:   方法 getOrderNo()
+  位置: 类型为com.qiongguichou.payment.entity.PaymentOrder的变量 paymentOrder
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[134,28] 找不到符号
+  符号:   方法 isMockEnabled()
+  位置: 类型为com.qiongguichou.payment.config.WxPayConfig的变量 wxPayConfig
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[137,23] 找不到符号
+  符号:   方法 setWxPayParams(<nulltype>)
+  位置: 类型为com.qiongguichou.payment.dto.PayResult的变量 result
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[142,23] 找不到符号
+  符号:   方法 setAppId(java.lang.String)
+  位置: 类型为com.qiongguichou.payment.dto.PayResult.WxPayParams的变量 params
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[143,23] 找不到符号
+  符号:   方法 setTimeStamp(java.lang.String)
+  位置: 类型为com.qiongguichou.payment.dto.PayResult.WxPayParams的变量 params
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[144,23] 找不到符号
+  符号:   方法 setNonceStr(java.lang.String)
+  位置: 类型为com.qiongguichou.payment.dto.PayResult.WxPayParams的变量 params
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[145,23] 找不到符号
+  符号:   方法 setPackageValue(java.lang.String)
+  位置: 类型为com.qiongguichou.payment.dto.PayResult.WxPayParams的变量 params
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[146,23] 找不到符号
+  符号:   方法 setSignType(java.lang.String)
+  位置: 类型为com.qiongguichou.payment.dto.PayResult.WxPayParams的变量 params
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[147,23] 找不到符号
+  符号:   方法 setPaySign(java.lang.String)
+  位置: 类型为com.qiongguichou.payment.dto.PayResult.WxPayParams的变量 params
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[148,23] 找不到符号
+  符号:   方法 setWxPayParams(com.qiongguichou.payment.dto.PayResult.WxPayParams)
+  位置: 类型为com.qiongguichou.payment.dto.PayResult的变量 result
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[155,50] 找不到符号
+  符号:   变量 SYSTEM_BUSY
+  位置: 类 com.qiongguichou.common.result.ErrorCode
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[170,24] 找不到符号
+  符号:   方法 isMockEnabled()
+  位置: 类型为com.qiongguichou.payment.config.WxPayConfig的变量 wxPayConfig
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[181,33] 方法引用无效
+  找不到符号
+    符号:   方法 getTransactionId()
+    位置: 类 com.qiongguichou.payment.entity.PaymentOrder
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[183,89] 找不到符号
+  符号:   方法 getStatus()
+  位置: 类型为com.qiongguichou.payment.entity.PaymentOrder的变量 paymentOrder
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[191,33] 方法引用无效
+  找不到符号
+    符号:   方法 getOrderNo()
+    位置: 类 com.qiongguichou.payment.entity.PaymentOrder
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[194,17] 找不到符号
+  符号:   变量 log
+  位置: 类 com.qiongguichou.payment.service.impl.PaymentServiceImpl
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[199,66] 找不到符号
+  符号:   方法 getStatus()
+  位置: 类型为com.qiongguichou.payment.entity.PaymentOrder的变量 paymentOrder
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[200,72] 找不到符号
+  符号:   方法 getStatus()
+  位置: 类型为com.qiongguichou.payment.entity.PaymentOrder的变量 paymentOrder
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[206,25] 找不到符号
+  符号:   方法 setStatus(java.lang.String)
+  位置: 类型为com.qiongguichou.payment.entity.PaymentOrder的变量 paymentOrder
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[207,25] 找不到符号
+  符号:   方法 setEffectiveAmount(java.lang.Long)
+  位置: 类型为com.qiongguichou.payment.entity.PaymentOrder的变量 paymentOrder
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[208,25] 找不到符号
+  符号:   方法 setTransactionId(java.lang.String)
+  位置: 类型为com.qiongguichou.payment.entity.PaymentOrder的变量 paymentOrder
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[209,25] 找不到符号
+  符号:   方法 setPayTime(java.time.LocalDateTime)
+  位置: 类型为com.qiongguichou.payment.entity.PaymentOrder的变量 paymentOrder
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[210,25] 找不到符号
+  符号:   方法 setNotifyTime(java.time.LocalDateTime)
+  位置: 类型为com.qiongguichou.payment.entity.PaymentOrder的变量 paymentOrder
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[218,13] 找不到符号
+  符号:   变量 log
+  位置: 类 com.qiongguichou.payment.service.impl.PaymentServiceImpl
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[229,24] 找不到符号
+  符号:   方法 isMockEnabled()
+  位置: 类型为com.qiongguichou.payment.config.WxPayConfig的变量 wxPayConfig
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[239,33] 方法引用无效
+  找不到符号
+    符号:   方法 getRefundNo()
+    位置: 类 com.qiongguichou.payment.entity.RefundOrder
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[242,17] 找不到符号
+  符号:   变量 log
+  位置: 类 com.qiongguichou.payment.service.impl.PaymentServiceImpl
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[246,40] 找不到符号
+  符号:   方法 getStatus()
+  位置: 类型为com.github.binarywang.wxpay.bean.notify.WxPayRefundNotifyV3Result.DecryptNotifyResult的变量 result
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[247,28] 找不到符号
+  符号:   方法 setStatus(java.lang.String)
+  位置: 类型为com.qiongguichou.payment.entity.RefundOrder的变量 refundOrder
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[248,28] 找不到符号
+  符号:   方法 setWechatRefundId(java.lang.String)
+  位置: 类型为com.qiongguichou.payment.entity.RefundOrder的变量 refundOrder
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[249,28] 找不到符号
+  符号:   方法 setRefundTime(java.time.LocalDateTime)
+  位置: 类型为com.qiongguichou.payment.entity.RefundOrder的变量 refundOrder
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[251,28] 找不到符号
+  符号:   方法 setStatus(java.lang.String)
+  位置: 类型为com.qiongguichou.payment.entity.RefundOrder的变量 refundOrder
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[257,13] 找不到符号
+  符号:   变量 log
+  位置: 类 com.qiongguichou.payment.service.impl.PaymentServiceImpl
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[274,20] 找不到符号
+  符号:   方法 setRefundNo(java.lang.String)
+  位置: 类型为com.qiongguichou.payment.entity.RefundOrder的变量 refundOrder
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[275,51] 找不到符号
+  符号:   方法 getOrderNo()
+  位置: 类型为com.qiongguichou.payment.entity.PaymentOrder的变量 paymentOrder
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[276,47] 找不到符号
+  符号:   方法 getCampaignId()
+  位置: 类型为com.qiongguichou.payment.entity.PaymentOrder的变量 paymentOrder
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[277,43] 找不到符号
+  符号:   方法 getSupporterUserId()
+  位置: 类型为com.qiongguichou.payment.entity.PaymentOrder的变量 paymentOrder
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[278,20] 找不到符号
+  符号:   方法 setAmount(java.lang.Long)
+  位置: 类型为com.qiongguichou.payment.entity.RefundOrder的变量 refundOrder
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[279,20] 找不到符号
+  符号:   方法 setReason(java.lang.String)
+  位置: 类型为com.qiongguichou.payment.entity.RefundOrder的变量 refundOrder
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[280,20] 找不到符号
+  符号:   方法 setType(java.lang.String)
+  位置: 类型为com.qiongguichou.payment.entity.RefundOrder的变量 refundOrder
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[281,20] 找不到符号
+  符号:   方法 setStatus(java.lang.String)
+  位置: 类型为com.qiongguichou.payment.entity.RefundOrder的变量 refundOrder
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[285,21] 找不到符号
+  符号:   方法 setStatus(java.lang.String)
+  位置: 类型为com.qiongguichou.payment.entity.PaymentOrder的变量 paymentOrder
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[289,24] 找不到符号
+  符号:   方法 isMockEnabled()
+  位置: 类型为com.qiongguichou.payment.config.WxPayConfig的变量 wxPayConfig
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[290,24] 找不到符号
+  符号:   方法 setStatus(java.lang.String)
+  位置: 类型为com.qiongguichou.payment.entity.RefundOrder的变量 refundOrder
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[291,24] 找不到符号
+  符号:   方法 setRefundTime(java.time.LocalDateTime)
+  位置: 类型为com.qiongguichou.payment.entity.RefundOrder的变量 refundOrder
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[293,25] 找不到符号
+  符号:   方法 setStatus(java.lang.String)
+  位置: 类型为com.qiongguichou.payment.entity.PaymentOrder的变量 paymentOrder
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[307,86] 找不到符号
+  符号:   方法 getStatus()
+  位置: 类型为com.qiongguichou.payment.entity.PaymentOrder的变量 paymentOrder
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[312,25] 找不到符号
+  符号:   方法 isMockEnabled()
+  位置: 类型为com.qiongguichou.payment.config.WxPayConfig的变量 wxPayConfig
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[314,53] 找不到符号
+  符号:   方法 getOrderNo()
+  位置: 类型为com.qiongguichou.payment.entity.PaymentOrder的变量 paymentOrder
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[316,54] 找不到符号
+  符号:   方法 getOrderNo()
+  位置: 类型为com.qiongguichou.payment.entity.PaymentOrder的变量 paymentOrder
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[316,17] 找不到符号
+  符号:   变量 log
+  位置: 类 com.qiongguichou.payment.service.impl.PaymentServiceImpl
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[321,21] 找不到符号
+  符号:   方法 setStatus(java.lang.String)
+  位置: 类型为com.qiongguichou.payment.entity.PaymentOrder的变量 paymentOrder
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[327,69] 找不到符号
+  符号:   方法 getSupportNo()
+  位置: 类型为com.qiongguichou.payment.entity.PaymentOrder的变量 paymentOrder
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[327,29] 方法引用无效
+  找不到符号
+    符号:   方法 getSupportNo()
+    位置: 类 com.qiongguichou.payment.entity.SupportOrder
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[329,66] 找不到符号
+  符号:   方法 getStatus()
+  位置: 类型为com.qiongguichou.payment.entity.SupportOrder的变量 supportOrder
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[330,25] 找不到符号
+  符号:   方法 setStatus(java.lang.String)
+  位置: 类型为com.qiongguichou.payment.entity.SupportOrder的变量 supportOrder
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[344,69] 找不到符号
+  符号:   方法 getSupportNo()
+  位置: 类型为com.qiongguichou.payment.entity.PaymentOrder的变量 paymentOrder
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[344,29] 方法引用无效
+  找不到符号
+    符号:   方法 getSupportNo()
+    位置: 类 com.qiongguichou.payment.entity.SupportOrder
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[347,25] 找不到符号
+  符号:   方法 setStatus(java.lang.String)
+  位置: 类型为com.qiongguichou.payment.entity.SupportOrder的变量 supportOrder
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[348,57] 找不到符号
+  符号:   方法 getEffectiveAmount()
+  位置: 类型为com.qiongguichou.payment.entity.PaymentOrder的变量 paymentOrder
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[349,49] 找不到符号
+  符号:   方法 getPayTime()
+  位置: 类型为com.qiongguichou.payment.entity.PaymentOrder的变量 paymentOrder
+[INFO] 100 errors 
+[INFO] -------------------------------------------------------------
+[INFO] ------------------------------------------------------------------------
+[INFO] Reactor Summary:
+[INFO] 
+[INFO] qgc-common ......................................... SUCCESS [  1.295 s]
+[INFO] qgc-core ........................................... SUCCESS [  0.525 s]
+[INFO] qgc-user ........................................... SUCCESS [  0.217 s]
+[INFO] qgc-campaign ....................................... SUCCESS [  0.091 s]
+[INFO] qgc-payment ........................................ FAILURE [  2.446 s]
+[INFO] qgc-wallet ......................................... SKIPPED
+[INFO] qgc-content ........................................ SKIPPED
+[INFO] qgc-server ......................................... SKIPPED
+[INFO] qgc-wechat ......................................... SKIPPED
+[INFO] qgc-admin .......................................... SKIPPED
+[INFO] qgc-job ............................................ SKIPPED
+[INFO] qgc-server-main .................................... SKIPPED
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time: 7.798 s
+[INFO] Finished at: 2026-09-05T11:41:24+08:00
+[INFO] Final Memory: 125M/1092M
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin:3.10.1:compile (default-compile) on project qgc-payment: Compilation failure: Compilation failure:
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/config/WxPayConfig.java:[3,1] 已在该编译单元中定义com.qiongguichou.payment.config.WxPayConfig
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/controller/PaymentController.java:[49,13] 找不到符号
+[ERROR] 符号:   变量 log
+[ERROR] 位置: 类 com.qiongguichou.payment.controller.PaymentController
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/controller/PaymentController.java:[64,13] 找不到符号
+[ERROR] 符号:   变量 log
+[ERROR] 位置: 类 com.qiongguichou.payment.controller.PaymentController
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/config/WxPayConfig.java:[46,18] 找不到符号
+[ERROR] 符号:   方法 setAppId(java.lang.String)
+[ERROR] 位置: 类型为com.qiongguichou.payment.config.WxPayConfig的变量 payConfig
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/config/WxPayConfig.java:[47,18] 找不到符号
+[ERROR] 符号:   方法 setMchId(java.lang.String)
+[ERROR] 位置: 类型为com.qiongguichou.payment.config.WxPayConfig的变量 payConfig
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/config/WxPayConfig.java:[48,18] 找不到符号
+[ERROR] 符号:   方法 setMchKey(java.lang.String)
+[ERROR] 位置: 类型为com.qiongguichou.payment.config.WxPayConfig的变量 payConfig
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/config/WxPayConfig.java:[49,18] 找不到符号
+[ERROR] 符号:   方法 setNotifyUrl(java.lang.String)
+[ERROR] 位置: 类型为com.qiongguichou.payment.config.WxPayConfig的变量 payConfig
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/config/WxPayConfig.java:[50,18] 找不到符号
+[ERROR] 符号:   方法 setRefundNotifyUrl(java.lang.String)
+[ERROR] 位置: 类型为com.qiongguichou.payment.config.WxPayConfig的变量 payConfig
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/config/WxPayConfig.java:[51,18] 找不到符号
+[ERROR] 符号:   方法 setKeyPath(java.lang.String)
+[ERROR] 位置: 类型为com.qiongguichou.payment.config.WxPayConfig的变量 payConfig
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/config/WxPayConfig.java:[52,18] 找不到符号
+[ERROR] 符号:   方法 setTradeType(java.lang.String)
+[ERROR] 位置: 类型为com.qiongguichou.payment.config.WxPayConfig的变量 payConfig
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/config/WxPayConfig.java:[54,32] 不兼容的类型: com.qiongguichou.payment.config.WxPayConfig无法转换为com.github.binarywang.wxpay.config.WxPayConfig
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[69,34] 找不到符号
+[ERROR] 符号:   方法 getCampaignId()
+[ERROR] 位置: 类型为com.qiongguichou.payment.dto.PayRequest的变量 request
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[70,30] 找不到符号
+[ERROR] 符号:   方法 getAmount()
+[ERROR] 位置: 类型为com.qiongguichou.payment.dto.PayRequest的变量 request
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[79,54] 找不到符号
+[ERROR] 符号:   变量 SYSTEM_BUSY
+[ERROR] 位置: 类 com.qiongguichou.common.result.ErrorCode
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[95,54] 找不到符号
+[ERROR] 符号:   变量 PAY_AMOUNT_EXCEED
+[ERROR] 位置: 类 com.qiongguichou.common.result.ErrorCode
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[101,25] 找不到符号
+[ERROR] 符号:   方法 setSupportNo(java.lang.String)
+[ERROR] 位置: 类型为com.qiongguichou.payment.entity.SupportOrder的变量 supportOrder
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[102,25] 找不到符号
+[ERROR] 符号:   方法 setCampaignId(java.lang.Long)
+[ERROR] 位置: 类型为com.qiongguichou.payment.entity.SupportOrder的变量 supportOrder
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[103,25] 找不到符号
+[ERROR] 符号:   方法 setSupporterUserId(java.lang.Long)
+[ERROR] 位置: 类型为com.qiongguichou.payment.entity.SupportOrder的变量 supportOrder
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[104,25] 找不到符号
+[ERROR] 符号:   方法 setCreatorUserId(java.lang.Long)
+[ERROR] 位置: 类型为com.qiongguichou.payment.entity.SupportOrder的变量 supportOrder
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[105,25] 找不到符号
+[ERROR] 符号:   方法 setAmount(java.lang.Long)
+[ERROR] 位置: 类型为com.qiongguichou.payment.entity.SupportOrder的变量 supportOrder
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[106,25] 找不到符号
+[ERROR] 符号:   方法 setEffectiveAmount(long)
+[ERROR] 位置: 类型为com.qiongguichou.payment.entity.SupportOrder的变量 supportOrder
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[107,25] 找不到符号
+[ERROR] 符号:   方法 setRefundAmount(long)
+[ERROR] 位置: 类型为com.qiongguichou.payment.entity.SupportOrder的变量 supportOrder
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[108,44] 找不到符号
+[ERROR] 符号:   方法 getMessage()
+[ERROR] 位置: 类型为com.qiongguichou.payment.dto.PayRequest的变量 request
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[109,46] 找不到符号
+[ERROR] 符号:   方法 getAnonymous()
+[ERROR] 位置: 类型为com.qiongguichou.payment.dto.PayRequest的变量 request
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[109,79] 找不到符号
+[ERROR] 符号:   方法 getAnonymous()
+[ERROR] 位置: 类型为com.qiongguichou.payment.dto.PayRequest的变量 request
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[110,25] 找不到符号
+[ERROR] 符号:   方法 setHideAmount(int)
+[ERROR] 位置: 类型为com.qiongguichou.payment.entity.SupportOrder的变量 supportOrder
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[111,25] 找不到符号
+[ERROR] 符号:   方法 setStatus(java.lang.String)
+[ERROR] 位置: 类型为com.qiongguichou.payment.entity.SupportOrder的变量 supportOrder
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[116,25] 找不到符号
+[ERROR] 符号:   方法 setOrderNo(java.lang.String)
+[ERROR] 位置: 类型为com.qiongguichou.payment.entity.PaymentOrder的变量 paymentOrder
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[117,51] 找不到符号
+[ERROR] 符号:   方法 getSupportNo()
+[ERROR] 位置: 类型为com.qiongguichou.payment.entity.SupportOrder的变量 supportOrder
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[118,25] 找不到符号
+[ERROR] 符号:   方法 setCampaignId(java.lang.Long)
+[ERROR] 位置: 类型为com.qiongguichou.payment.entity.PaymentOrder的变量 paymentOrder
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[119,25] 找不到符号
+[ERROR] 符号:   方法 setSupporterUserId(java.lang.Long)
+[ERROR] 位置: 类型为com.qiongguichou.payment.entity.PaymentOrder的变量 paymentOrder
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[120,25] 找不到符号
+[ERROR] 符号:   方法 setCreatorUserId(java.lang.Long)
+[ERROR] 位置: 类型为com.qiongguichou.payment.entity.PaymentOrder的变量 paymentOrder
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[121,25] 找不到符号
+[ERROR] 符号:   方法 setAmount(java.lang.Long)
+[ERROR] 位置: 类型为com.qiongguichou.payment.entity.PaymentOrder的变量 paymentOrder
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[122,25] 找不到符号
+[ERROR] 符号:   方法 setEffectiveAmount(long)
+[ERROR] 位置: 类型为com.qiongguichou.payment.entity.PaymentOrder的变量 paymentOrder
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[123,25] 找不到符号
+[ERROR] 符号:   方法 setRefundAmount(long)
+[ERROR] 位置: 类型为com.qiongguichou.payment.entity.PaymentOrder的变量 paymentOrder
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[124,25] 找不到符号
+[ERROR] 符号:   方法 setTradeType(java.lang.String)
+[ERROR] 位置: 类型为com.qiongguichou.payment.entity.PaymentOrder的变量 paymentOrder
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[125,25] 找不到符号
+[ERROR] 符号:   方法 setOpenid(java.lang.String)
+[ERROR] 位置: 类型为com.qiongguichou.payment.entity.PaymentOrder的变量 paymentOrder
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[126,25] 找不到符号
+[ERROR] 符号:   方法 setStatus(java.lang.String)
+[ERROR] 位置: 类型为com.qiongguichou.payment.entity.PaymentOrder的变量 paymentOrder
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[131,43] 找不到符号
+[ERROR] 符号:   方法 getSupportNo()
+[ERROR] 位置: 类型为com.qiongguichou.payment.entity.SupportOrder的变量 supportOrder
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[132,50] 找不到符号
+[ERROR] 符号:   方法 getOrderNo()
+[ERROR] 位置: 类型为com.qiongguichou.payment.entity.PaymentOrder的变量 paymentOrder
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[134,28] 找不到符号
+[ERROR] 符号:   方法 isMockEnabled()
+[ERROR] 位置: 类型为com.qiongguichou.payment.config.WxPayConfig的变量 wxPayConfig
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[137,23] 找不到符号
+[ERROR] 符号:   方法 setWxPayParams(<nulltype>)
+[ERROR] 位置: 类型为com.qiongguichou.payment.dto.PayResult的变量 result
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[142,23] 找不到符号
+[ERROR] 符号:   方法 setAppId(java.lang.String)
+[ERROR] 位置: 类型为com.qiongguichou.payment.dto.PayResult.WxPayParams的变量 params
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[143,23] 找不到符号
+[ERROR] 符号:   方法 setTimeStamp(java.lang.String)
+[ERROR] 位置: 类型为com.qiongguichou.payment.dto.PayResult.WxPayParams的变量 params
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[144,23] 找不到符号
+[ERROR] 符号:   方法 setNonceStr(java.lang.String)
+[ERROR] 位置: 类型为com.qiongguichou.payment.dto.PayResult.WxPayParams的变量 params
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[145,23] 找不到符号
+[ERROR] 符号:   方法 setPackageValue(java.lang.String)
+[ERROR] 位置: 类型为com.qiongguichou.payment.dto.PayResult.WxPayParams的变量 params
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[146,23] 找不到符号
+[ERROR] 符号:   方法 setSignType(java.lang.String)
+[ERROR] 位置: 类型为com.qiongguichou.payment.dto.PayResult.WxPayParams的变量 params
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[147,23] 找不到符号
+[ERROR] 符号:   方法 setPaySign(java.lang.String)
+[ERROR] 位置: 类型为com.qiongguichou.payment.dto.PayResult.WxPayParams的变量 params
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[148,23] 找不到符号
+[ERROR] 符号:   方法 setWxPayParams(com.qiongguichou.payment.dto.PayResult.WxPayParams)
+[ERROR] 位置: 类型为com.qiongguichou.payment.dto.PayResult的变量 result
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[155,50] 找不到符号
+[ERROR] 符号:   变量 SYSTEM_BUSY
+[ERROR] 位置: 类 com.qiongguichou.common.result.ErrorCode
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[170,24] 找不到符号
+[ERROR] 符号:   方法 isMockEnabled()
+[ERROR] 位置: 类型为com.qiongguichou.payment.config.WxPayConfig的变量 wxPayConfig
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[181,33] 方法引用无效
+[ERROR] 找不到符号
+[ERROR] 符号:   方法 getTransactionId()
+[ERROR] 位置: 类 com.qiongguichou.payment.entity.PaymentOrder
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[183,89] 找不到符号
+[ERROR] 符号:   方法 getStatus()
+[ERROR] 位置: 类型为com.qiongguichou.payment.entity.PaymentOrder的变量 paymentOrder
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[191,33] 方法引用无效
+[ERROR] 找不到符号
+[ERROR] 符号:   方法 getOrderNo()
+[ERROR] 位置: 类 com.qiongguichou.payment.entity.PaymentOrder
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[194,17] 找不到符号
+[ERROR] 符号:   变量 log
+[ERROR] 位置: 类 com.qiongguichou.payment.service.impl.PaymentServiceImpl
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[199,66] 找不到符号
+[ERROR] 符号:   方法 getStatus()
+[ERROR] 位置: 类型为com.qiongguichou.payment.entity.PaymentOrder的变量 paymentOrder
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[200,72] 找不到符号
+[ERROR] 符号:   方法 getStatus()
+[ERROR] 位置: 类型为com.qiongguichou.payment.entity.PaymentOrder的变量 paymentOrder
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[206,25] 找不到符号
+[ERROR] 符号:   方法 setStatus(java.lang.String)
+[ERROR] 位置: 类型为com.qiongguichou.payment.entity.PaymentOrder的变量 paymentOrder
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[207,25] 找不到符号
+[ERROR] 符号:   方法 setEffectiveAmount(java.lang.Long)
+[ERROR] 位置: 类型为com.qiongguichou.payment.entity.PaymentOrder的变量 paymentOrder
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[208,25] 找不到符号
+[ERROR] 符号:   方法 setTransactionId(java.lang.String)
+[ERROR] 位置: 类型为com.qiongguichou.payment.entity.PaymentOrder的变量 paymentOrder
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[209,25] 找不到符号
+[ERROR] 符号:   方法 setPayTime(java.time.LocalDateTime)
+[ERROR] 位置: 类型为com.qiongguichou.payment.entity.PaymentOrder的变量 paymentOrder
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[210,25] 找不到符号
+[ERROR] 符号:   方法 setNotifyTime(java.time.LocalDateTime)
+[ERROR] 位置: 类型为com.qiongguichou.payment.entity.PaymentOrder的变量 paymentOrder
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[218,13] 找不到符号
+[ERROR] 符号:   变量 log
+[ERROR] 位置: 类 com.qiongguichou.payment.service.impl.PaymentServiceImpl
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[229,24] 找不到符号
+[ERROR] 符号:   方法 isMockEnabled()
+[ERROR] 位置: 类型为com.qiongguichou.payment.config.WxPayConfig的变量 wxPayConfig
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[239,33] 方法引用无效
+[ERROR] 找不到符号
+[ERROR] 符号:   方法 getRefundNo()
+[ERROR] 位置: 类 com.qiongguichou.payment.entity.RefundOrder
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[242,17] 找不到符号
+[ERROR] 符号:   变量 log
+[ERROR] 位置: 类 com.qiongguichou.payment.service.impl.PaymentServiceImpl
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[246,40] 找不到符号
+[ERROR] 符号:   方法 getStatus()
+[ERROR] 位置: 类型为com.github.binarywang.wxpay.bean.notify.WxPayRefundNotifyV3Result.DecryptNotifyResult的变量 result
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[247,28] 找不到符号
+[ERROR] 符号:   方法 setStatus(java.lang.String)
+[ERROR] 位置: 类型为com.qiongguichou.payment.entity.RefundOrder的变量 refundOrder
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[248,28] 找不到符号
+[ERROR] 符号:   方法 setWechatRefundId(java.lang.String)
+[ERROR] 位置: 类型为com.qiongguichou.payment.entity.RefundOrder的变量 refundOrder
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[249,28] 找不到符号
+[ERROR] 符号:   方法 setRefundTime(java.time.LocalDateTime)
+[ERROR] 位置: 类型为com.qiongguichou.payment.entity.RefundOrder的变量 refundOrder
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[251,28] 找不到符号
+[ERROR] 符号:   方法 setStatus(java.lang.String)
+[ERROR] 位置: 类型为com.qiongguichou.payment.entity.RefundOrder的变量 refundOrder
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[257,13] 找不到符号
+[ERROR] 符号:   变量 log
+[ERROR] 位置: 类 com.qiongguichou.payment.service.impl.PaymentServiceImpl
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[274,20] 找不到符号
+[ERROR] 符号:   方法 setRefundNo(java.lang.String)
+[ERROR] 位置: 类型为com.qiongguichou.payment.entity.RefundOrder的变量 refundOrder
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[275,51] 找不到符号
+[ERROR] 符号:   方法 getOrderNo()
+[ERROR] 位置: 类型为com.qiongguichou.payment.entity.PaymentOrder的变量 paymentOrder
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[276,47] 找不到符号
+[ERROR] 符号:   方法 getCampaignId()
+[ERROR] 位置: 类型为com.qiongguichou.payment.entity.PaymentOrder的变量 paymentOrder
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[277,43] 找不到符号
+[ERROR] 符号:   方法 getSupporterUserId()
+[ERROR] 位置: 类型为com.qiongguichou.payment.entity.PaymentOrder的变量 paymentOrder
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[278,20] 找不到符号
+[ERROR] 符号:   方法 setAmount(java.lang.Long)
+[ERROR] 位置: 类型为com.qiongguichou.payment.entity.RefundOrder的变量 refundOrder
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[279,20] 找不到符号
+[ERROR] 符号:   方法 setReason(java.lang.String)
+[ERROR] 位置: 类型为com.qiongguichou.payment.entity.RefundOrder的变量 refundOrder
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[280,20] 找不到符号
+[ERROR] 符号:   方法 setType(java.lang.String)
+[ERROR] 位置: 类型为com.qiongguichou.payment.entity.RefundOrder的变量 refundOrder
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[281,20] 找不到符号
+[ERROR] 符号:   方法 setStatus(java.lang.String)
+[ERROR] 位置: 类型为com.qiongguichou.payment.entity.RefundOrder的变量 refundOrder
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[285,21] 找不到符号
+[ERROR] 符号:   方法 setStatus(java.lang.String)
+[ERROR] 位置: 类型为com.qiongguichou.payment.entity.PaymentOrder的变量 paymentOrder
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[289,24] 找不到符号
+[ERROR] 符号:   方法 isMockEnabled()
+[ERROR] 位置: 类型为com.qiongguichou.payment.config.WxPayConfig的变量 wxPayConfig
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[290,24] 找不到符号
+[ERROR] 符号:   方法 setStatus(java.lang.String)
+[ERROR] 位置: 类型为com.qiongguichou.payment.entity.RefundOrder的变量 refundOrder
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[291,24] 找不到符号
+[ERROR] 符号:   方法 setRefundTime(java.time.LocalDateTime)
+[ERROR] 位置: 类型为com.qiongguichou.payment.entity.RefundOrder的变量 refundOrder
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[293,25] 找不到符号
+[ERROR] 符号:   方法 setStatus(java.lang.String)
+[ERROR] 位置: 类型为com.qiongguichou.payment.entity.PaymentOrder的变量 paymentOrder
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[307,86] 找不到符号
+[ERROR] 符号:   方法 getStatus()
+[ERROR] 位置: 类型为com.qiongguichou.payment.entity.PaymentOrder的变量 paymentOrder
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[312,25] 找不到符号
+[ERROR] 符号:   方法 isMockEnabled()
+[ERROR] 位置: 类型为com.qiongguichou.payment.config.WxPayConfig的变量 wxPayConfig
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[314,53] 找不到符号
+[ERROR] 符号:   方法 getOrderNo()
+[ERROR] 位置: 类型为com.qiongguichou.payment.entity.PaymentOrder的变量 paymentOrder
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[316,54] 找不到符号
+[ERROR] 符号:   方法 getOrderNo()
+[ERROR] 位置: 类型为com.qiongguichou.payment.entity.PaymentOrder的变量 paymentOrder
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[316,17] 找不到符号
+[ERROR] 符号:   变量 log
+[ERROR] 位置: 类 com.qiongguichou.payment.service.impl.PaymentServiceImpl
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[321,21] 找不到符号
+[ERROR] 符号:   方法 setStatus(java.lang.String)
+[ERROR] 位置: 类型为com.qiongguichou.payment.entity.PaymentOrder的变量 paymentOrder
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[327,69] 找不到符号
+[ERROR] 符号:   方法 getSupportNo()
+[ERROR] 位置: 类型为com.qiongguichou.payment.entity.PaymentOrder的变量 paymentOrder
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[327,29] 方法引用无效
+[ERROR] 找不到符号
+[ERROR] 符号:   方法 getSupportNo()
+[ERROR] 位置: 类 com.qiongguichou.payment.entity.SupportOrder
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[329,66] 找不到符号
+[ERROR] 符号:   方法 getStatus()
+[ERROR] 位置: 类型为com.qiongguichou.payment.entity.SupportOrder的变量 supportOrder
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[330,25] 找不到符号
+[ERROR] 符号:   方法 setStatus(java.lang.String)
+[ERROR] 位置: 类型为com.qiongguichou.payment.entity.SupportOrder的变量 supportOrder
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[344,69] 找不到符号
+[ERROR] 符号:   方法 getSupportNo()
+[ERROR] 位置: 类型为com.qiongguichou.payment.entity.PaymentOrder的变量 paymentOrder
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[344,29] 方法引用无效
+[ERROR] 找不到符号
+[ERROR] 符号:   方法 getSupportNo()
+[ERROR] 位置: 类 com.qiongguichou.payment.entity.SupportOrder
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[347,25] 找不到符号
+[ERROR] 符号:   方法 setStatus(java.lang.String)
+[ERROR] 位置: 类型为com.qiongguichou.payment.entity.SupportOrder的变量 supportOrder
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[348,57] 找不到符号
+[ERROR] 符号:   方法 getEffectiveAmount()
+[ERROR] 位置: 类型为com.qiongguichou.payment.entity.PaymentOrder的变量 paymentOrder
+[ERROR] /D:/git/fan/aixm/qgc/qgc/qgc-server/qgc-payment/src/main/java/com/qiongguichou/payment/service/impl/PaymentServiceImpl.java:[349,49] 找不到符号
+[ERROR] 符号:   方法 getPayTime()
+[ERROR] 位置: 类型为com.qiongguichou.payment.entity.PaymentOrder的变量 paymentOrder
+[ERROR] -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException
+[ERROR] 
+[ERROR] After correcting the problems, you can resume the build with the command
+[ERROR]   mvn <goals> -rf :qgc-payment

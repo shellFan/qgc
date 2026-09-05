@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qiongguichou.campaign.mapper.CampaignMapper">
+
+    <!-- 筹款列表VO结果映射 -->
+    <resultMap id="campaignListVOMap" type="com.qiongguichou.campaign.dto.CampaignListVO">
+        <id column="id" property="id"/>
+        <result column="campaign_no" property="campaignNo"/>
+        <result column="title" property="title"/>
+        <result column="cover" property="cover"/>
+        <result column="creator_user_id" property="creatorUserId"/>
+        <result column="creator_nickname" property="creatorNickname"/>
+        <result column="creator_avatar" property="creatorAvatar"/>
+        <result column="target_amount" property="targetAmount"/>
+        <result column="raised_amount" property="raisedAmount"/>
+        <result column="support_count" property="supportCount"/>
+        <result column="category_name" property="categoryName"/>
+        <result column="status" property="status"/>
+        <result column="end_time" property="endTime"/>
+    </resultMap>
+
+    <!-- 分页查询筹款列表(多条件筛选，兼容MySQL 5.6) -->
+    <select id="selectCampaignList" resultMap="campaignListVOMap">
+        SELECT
+            c.id,
+            c.campaign_no,
+            c.title,
+            c.cover,
+            c.creator_user_id,
+            u.nickname AS creator_nickname,
+            u.avatar AS creator_avatar,
+            c.target_amount,
+            c.raised_amount,
+            c.support_count,
+            cc.name AS category_name,
+            c.status,
+            c.end_time
+        FROM qgc_campaign c
+        LEFT JOIN qgc_user u ON c.creator_user_id = u.id
+        LEFT JOIN qgc_campaign_category cc ON c.category_id = cc.id
+        WHERE c.deleted = 0
+        <if test="creatorUserId != null">
+            AND c.creator_user_id = #{creatorUserId}
+        </if>
+        <if test="status != null and status != ''">
+            AND c.status = #{status}
+        </if>
+        <if test="categoryId != null">
+            AND c.category_id = #{categoryId}
+        </if>
+        <if test="keyword != null and keyword != ''">
+            AND c.title LIKE CONCAT('%', #{keyword}, '%')
+        </if>
+        <choose>
+            <when test="sort == 'NEW'">
+                ORDER BY c.create_time DESC
+            </when>
+            <when test="sort == 'ALMOST'">
+                ORDER BY (c.raised_amount * 1.0 / c.target_amount) DESC, c.create_time DESC
+            </when>
+            <when test="sort == 'RANDOM'">
+                ORDER BY RAND()
+            </when>
+            <when test="sort == 'POPULAR'">
+                ORDER BY c.support_count DESC, c.raised_amount DESC
+            </when>
+            <otherwise>
+                ORDER BY c.create_time DESC
+            </otherwise>
+        </choose>
+    </select>
+
+    <!-- 查询热门项目(按support_count和raised_amount综合排序) -->
+    <select id="selectHotCampaigns" resultMap="campaignListVOMap">
+        SELECT
+            c.id,
+            c.campaign_no,
+            c.title,
+            c.cover,
+            u.nickname AS creator_nickname,
+            u.avatar AS creator_avatar,
+            c.target_amount,
+            c.raised_amount,
+            c.support_count,
+            cc.name AS category_name,
+            c.status,
+            c.end_time
+        FROM qgc_campaign c
+        LEFT JOIN qgc_user u ON c.creator_user_id = u.id
+        LEFT JOIN qgc_campaign_category cc ON c.category_id = cc.id
+        WHERE c.deleted = 0
+          AND c.status = 'ACTIVE'
+        ORDER BY c.support_count DESC, c.raised_amount DESC
+        LIMIT #{limit}
+    </select>
+
+    <!-- 更新已筹金额(条件更新，防止超筹) -->
+    <update id="updateRaisedAmount">
+        UPDATE qgc_campaign
+        SET raised_amount = raised_amount + #{addAmount},
+            update_time = NOW()
+        WHERE id = #{id}
+          AND deleted = 0
+          AND (raised_amount + #{addAmount}) <= target_amount
+    </update>
+
+</mapper>

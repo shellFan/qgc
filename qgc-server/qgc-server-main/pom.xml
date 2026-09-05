@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.qiongguichou</groupId>
+        <artifactId>qgc-server</artifactId>
+        <version>1.0.0</version>
+    </parent>
+
+    <artifactId>qgc-server-main</artifactId>
+    <description>主启动模块(启动类/配置/全局拦截器)</description>
+
+    <dependencies>
+        <!-- qgc-core -->
+        <dependency>
+            <groupId>com.qiongguichou</groupId>
+            <artifactId>qgc-core</artifactId>
+        </dependency>
+
+        <!-- qgc-user -->
+        <dependency>
+            <groupId>com.qiongguichou</groupId>
+            <artifactId>qgc-user</artifactId>
+        </dependency>
+
+        <!-- qgc-campaign -->
+        <dependency>
+            <groupId>com.qiongguichou</groupId>
+            <artifactId>qgc-campaign</artifactId>
+        </dependency>
+
+        <!-- qgc-payment -->
+        <dependency>
+            <groupId>com.qiongguichou</groupId>
+            <artifactId>qgc-payment</artifactId>
+        </dependency>
+
+        <!-- qgc-wallet -->
+        <dependency>
+            <groupId>com.qiongguichou</groupId>
+            <artifactId>qgc-wallet</artifactId>
+        </dependency>
+
+        <!-- qgc-content -->
+        <dependency>
+            <groupId>com.qiongguichou</groupId>
+            <artifactId>qgc-content</artifactId>
+        </dependency>
+
+        <!-- qgc-wechat -->
+        <dependency>
+            <groupId>com.qiongguichou</groupId>
+            <artifactId>qgc-wechat</artifactId>
+        </dependency>
+
+        <!-- qgc-admin -->
+        <dependency>
+            <groupId>com.qiongguichou</groupId>
+            <artifactId>qgc-admin</artifactId>
+        </dependency>
+
+        <!-- qgc-job -->
+        <dependency>
+            <groupId>com.qiongguichou</groupId>
+            <artifactId>qgc-job</artifactId>
+        </dependency>
+
+        <!-- Spring Boot Starter Web -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+        <!-- Spring Boot Starter Test -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <mainClass>com.qiongguichou.QgcApplication</mainClass>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>
