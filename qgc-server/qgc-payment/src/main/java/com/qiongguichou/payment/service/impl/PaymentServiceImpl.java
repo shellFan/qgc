@@ -88,6 +88,10 @@ public class PaymentServiceImpl implements PaymentService {
             if (!CampaignStatus.ACTIVE.name().equals(campaign.getStatus())) {
                 throw new BusinessException(ErrorCode.CAMPAIGN_NOT_ACTIVE);
             }
+            // 不能投喂自己的筹款
+            if (campaign.getCreatorUserId().equals(userId)) {
+                throw new BusinessException(ErrorCode.FORBIDDEN, "不能投喂自己的筹款");
+            }
             Long remaining = campaign.getTargetAmount() - campaign.getRaisedAmount();
             if (remaining <= 0) {
                 throw new BusinessException(ErrorCode.CAMPAIGN_FULL);
@@ -202,8 +206,14 @@ public class PaymentServiceImpl implements PaymentService {
                 return "SUCCESS";
             }
 
-            // 更新支付订单
+            // 金额校验：回调金额必须与订单金额一致
             Long paidAmount = Long.parseLong(result.getAmount().getTotal() + "");
+            if (!paidAmount.equals(paymentOrder.getAmount())) {
+                log.error("支付回调金额不匹配: 订单金额={}, 回调金额={}", paymentOrder.getAmount(), paidAmount);
+                return "FAIL";
+            }
+
+            // 更新支付订单
             paymentOrder.setStatus(PaymentStatus.SUCCESS.name());
             paymentOrder.setEffectiveAmount(paidAmount);
             paymentOrder.setTransactionId(result.getTransactionId());

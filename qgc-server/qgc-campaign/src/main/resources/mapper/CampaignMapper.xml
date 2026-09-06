@@ -94,14 +94,17 @@
         LIMIT #{limit}
     </select>
 
-    <!-- 更新已筹金额(条件更新，防止超筹) -->
+    <!-- 更新已筹金额(正数为入账，负数为退款) -->
     <update id="updateRaisedAmount">
         UPDATE qgc_campaign
         SET raised_amount = raised_amount + #{addAmount},
             update_time = NOW()
         WHERE id = #{id}
           AND deleted = 0
-          AND (raised_amount + #{addAmount}) <= target_amount
+          AND (
+              #{addAmount} &lt; 0
+              OR (raised_amount + #{addAmount}) &lt;= target_amount
+          )
     </update>
 
 </mapper>

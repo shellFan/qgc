@@ -128,13 +128,17 @@ public class AdminWithdrawServiceImpl implements AdminWithdrawService {
             // 乐观锁更新余额（delta为正数，增加余额）
             int rows = walletMapper.updateBalance(order.getUserId(), returnAmount, wallet.getVersion());
             if (rows > 0) {
+                // 重新查询最新余额
+                Wallet updatedWallet = walletMapper.selectOne(
+                        new LambdaQueryWrapper<Wallet>().eq(Wallet::getUserId, order.getUserId())
+                );
                 // 记录流水
                 WalletFlow flow = new WalletFlow();
                 flow.setFlowNo(OrderNoUtil.flowNo());
                 flow.setUserId(order.getUserId());
                 flow.setType("WITHDRAW_FAIL_RETURN");
                 flow.setAmount(returnAmount);
-                flow.setBalanceAfter(wallet.getBalance() + returnAmount);
+                flow.setBalanceAfter(updatedWallet != null ? updatedWallet.getBalance() : wallet.getBalance() + returnAmount);
                 flow.setRelatedId(String.valueOf(order.getId()));
                 flow.setRelatedType("WITHDRAW_ORDER");
                 flow.setRemark(reason);

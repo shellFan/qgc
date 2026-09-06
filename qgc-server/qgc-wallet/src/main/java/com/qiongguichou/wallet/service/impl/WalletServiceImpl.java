@@ -82,13 +82,19 @@ public class WalletServiceImpl implements WalletService {
                 throw new BusinessException(ErrorCode.SYSTEM_BUSY, "余额更新冲突，请重试");
             }
 
+            // 重新查询最新余额用于流水记录
+            Wallet updatedWallet = walletMapper.selectOne(
+                    new LambdaQueryWrapper<Wallet>()
+                            .eq(Wallet::getUserId, userId)
+                            .last("LIMIT 1"));
+
             // 记录流水
             WalletFlow flow = new WalletFlow();
             flow.setFlowNo(OrderNoUtil.flowNo());
             flow.setUserId(userId);
             flow.setType(WalletFlowType.CAMPAIGN_INCOME.name());
             flow.setAmount(amount);
-            flow.setBalanceAfter(wallet.getBalance() + amount);
+            flow.setBalanceAfter(updatedWallet != null ? updatedWallet.getBalance() : wallet.getBalance() + amount);
             flow.setRelatedId(String.valueOf(campaignId));
             flow.setRelatedType("CAMPAIGN");
             flow.setRemark("筹款收入: " + campaignTitle);
@@ -143,13 +149,19 @@ public class WalletServiceImpl implements WalletService {
             order.setStatus("PENDING");
             withdrawOrderMapper.insert(order);
 
+            // 重新查询最新余额用于流水记录
+            Wallet updatedWallet = walletMapper.selectOne(
+                    new LambdaQueryWrapper<Wallet>()
+                            .eq(Wallet::getUserId, userId)
+                            .last("LIMIT 1"));
+
             // 记录流水
             WalletFlow flow = new WalletFlow();
             flow.setFlowNo(OrderNoUtil.flowNo());
             flow.setUserId(userId);
             flow.setType(WalletFlowType.WITHDRAW_APPLY.name());
             flow.setAmount(-request.getAmount());
-            flow.setBalanceAfter(wallet.getBalance() - request.getAmount());
+            flow.setBalanceAfter(updatedWallet != null ? updatedWallet.getBalance() : wallet.getBalance() - request.getAmount());
             flow.setRelatedId(String.valueOf(order.getId()));
             flow.setRelatedType("WITHDRAW");
             flow.setRemark("提现申请: " + MoneyUtil.fenToYuanStr(request.getAmount()) + "元");
