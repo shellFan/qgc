@@ -3,6 +3,7 @@ package com.qiongguichou.job;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.qiongguichou.campaign.entity.Campaign;
 import com.qiongguichou.campaign.mapper.CampaignMapper;
+import com.qiongguichou.common.enums.CampaignStatus;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -36,26 +37,26 @@ public class CampaignExpireJob {
             // 1. 关闭已到期但未筹满的筹款: ACTIVE → EXPIRED
             // 使用apply进行列比较（raised_amount < target_amount），兼容所有MyBatis-Plus版本
             LambdaUpdateWrapper<Campaign> expireWrapper = new LambdaUpdateWrapper<>();
-            expireWrapper.eq(Campaign::getStatus, "ACTIVE")
+            expireWrapper.eq(Campaign::getStatus, CampaignStatus.ACTIVE.name())
                     .lt(Campaign::getEndTime, now)
                     .apply("raised_amount < target_amount")
-                    .set(Campaign::getStatus, "EXPIRED")
+                    .set(Campaign::getStatus, CampaignStatus.EXPIRED.name())
                     .set(Campaign::getUpdateTime, now);
             int expiredCount = campaignMapper.update(null, expireWrapper);
 
             // 2. 标记已筹满的筹款: ACTIVE → SUCCESS
             LambdaUpdateWrapper<Campaign> successWrapper = new LambdaUpdateWrapper<>();
-            successWrapper.eq(Campaign::getStatus, "ACTIVE")
+            successWrapper.eq(Campaign::getStatus, CampaignStatus.ACTIVE.name())
                     .apply("raised_amount >= target_amount")
-                    .set(Campaign::getStatus, "SUCCESS")
+                    .set(Campaign::getStatus, CampaignStatus.SUCCESS.name())
                     .set(Campaign::getUpdateTime, now);
             int successCount = campaignMapper.update(null, successWrapper);
 
             // 3. 已到期且已筹满的筹款: EXPIRED → SUCCESS (可能上一轮漏掉的)
             LambdaUpdateWrapper<Campaign> lateSuccessWrapper = new LambdaUpdateWrapper<>();
-            lateSuccessWrapper.eq(Campaign::getStatus, "EXPIRED")
+            lateSuccessWrapper.eq(Campaign::getStatus, CampaignStatus.EXPIRED.name())
                     .apply("raised_amount >= target_amount")
-                    .set(Campaign::getStatus, "SUCCESS")
+                    .set(Campaign::getStatus, CampaignStatus.SUCCESS.name())
                     .set(Campaign::getUpdateTime, now);
             int lateSuccessCount = campaignMapper.update(null, lateSuccessWrapper);
 

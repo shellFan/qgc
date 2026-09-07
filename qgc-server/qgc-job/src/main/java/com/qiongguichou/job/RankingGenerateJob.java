@@ -3,6 +3,7 @@ package com.qiongguichou.job;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.qiongguichou.campaign.entity.Campaign;
 import com.qiongguichou.campaign.mapper.CampaignMapper;
+import com.qiongguichou.common.enums.CampaignStatus;
 import com.qiongguichou.core.entity.RankingSnapshot;
 import com.qiongguichou.core.mapper.RankingSnapshotMapper;
 import com.qiongguichou.user.entity.User;
@@ -46,7 +47,7 @@ public class RankingGenerateJob {
                 new LambdaQueryWrapper<Campaign>()
                         .ge(Campaign::getCreateTime, todayStart)
                         .le(Campaign::getCreateTime, todayEnd)
-                        .eq(Campaign::getStatus, "ACTIVE")
+                        .eq(Campaign::getStatus, CampaignStatus.ACTIVE.name())
                         .orderByDesc(Campaign::getTargetAmount)
                         .last("LIMIT 20"));
 
@@ -83,7 +84,7 @@ public class RankingGenerateJob {
         // 简化实现：查询活跃筹款中support_count最高的
         List<Campaign> campaigns = campaignMapper.selectList(
                 new LambdaQueryWrapper<Campaign>()
-                        .eq(Campaign::getStatus, "ACTIVE")
+                        .eq(Campaign::getStatus, CampaignStatus.ACTIVE.name())
                         .orderByDesc(Campaign::getSupportCount)
                         .last("LIMIT 20"));
 

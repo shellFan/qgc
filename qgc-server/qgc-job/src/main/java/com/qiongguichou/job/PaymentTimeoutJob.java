@@ -2,6 +2,8 @@ package com.qiongguichou.job;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.qiongguichou.common.enums.PaymentStatus;
+import com.qiongguichou.common.enums.SupportStatus;
 import com.qiongguichou.payment.entity.PaymentOrder;
 import com.qiongguichou.payment.entity.SupportOrder;
 import com.qiongguichou.payment.mapper.PaymentOrderMapper;
@@ -44,7 +46,7 @@ public class PaymentTimeoutJob {
         try {
             // 1. 查询超时的支付订单
             LambdaQueryWrapper<PaymentOrder> queryWrapper = new LambdaQueryWrapper<>();
-            queryWrapper.eq(PaymentOrder::getStatus, "CREATED")
+            queryWrapper.eq(PaymentOrder::getStatus, PaymentStatus.CREATED.name())
                     .lt(PaymentOrder::getCreateTime, timeoutThreshold);
             List<PaymentOrder> timeoutOrders = paymentOrderMapper.selectList(queryWrapper);
 
@@ -59,8 +61,8 @@ public class PaymentTimeoutJob {
                     // 2. 关闭支付订单: CREATED → CLOSED
                     LambdaUpdateWrapper<PaymentOrder> paymentWrapper = new LambdaUpdateWrapper<>();
                     paymentWrapper.eq(PaymentOrder::getId, order.getId())
-                            .eq(PaymentOrder::getStatus, "CREATED")
-                            .set(PaymentOrder::getStatus, "CLOSED")
+                            .eq(PaymentOrder::getStatus, PaymentStatus.CREATED.name())
+                            .set(PaymentOrder::getStatus, PaymentStatus.CLOSED.name())
                             .set(PaymentOrder::getUpdateTime, LocalDateTime.now());
                     int updated = paymentOrderMapper.update(null, paymentWrapper);
 
@@ -69,8 +71,8 @@ public class PaymentTimeoutJob {
                         if (order.getSupportNo() != null) {
                             LambdaUpdateWrapper<SupportOrder> supportWrapper = new LambdaUpdateWrapper<>();
                             supportWrapper.eq(SupportOrder::getSupportNo, order.getSupportNo())
-                                    .eq(SupportOrder::getStatus, "CREATED")
-                                    .set(SupportOrder::getStatus, "CLOSED")
+                                    .eq(SupportOrder::getStatus, SupportStatus.CREATED.name())
+                                    .set(SupportOrder::getStatus, SupportStatus.CLOSED.name())
                                     .set(SupportOrder::getUpdateTime, LocalDateTime.now());
                             supportOrderMapper.update(null, supportWrapper);
                         }

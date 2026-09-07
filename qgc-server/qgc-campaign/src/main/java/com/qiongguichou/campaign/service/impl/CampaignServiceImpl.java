@@ -279,7 +279,7 @@ public class CampaignServiceImpl implements CampaignService {
         }
 
         Page<CampaignListVO> page = new Page<>(pageNum, pageSize);
-        IPage<CampaignListVO> result = campaignMapper.selectCampaignList(page, null, "ACTIVE", categoryId, keyword, sort);
+        IPage<CampaignListVO> result = campaignMapper.selectCampaignList(page, null, CampaignStatus.ACTIVE.name(), categoryId, keyword, sort);
 
         // 填充计算字段
         for (CampaignListVO vo : result.getRecords()) {

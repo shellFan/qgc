@@ -8,6 +8,7 @@ import com.qiongguichou.admin.service.AdminCampaignService;
 import com.qiongguichou.campaign.entity.Campaign;
 import com.qiongguichou.campaign.mapper.CampaignMapper;
 import com.qiongguichou.common.enums.CampaignStatus;
+import com.qiongguichou.common.enums.ReportStatus;
 import com.qiongguichou.common.result.Result;
 import com.qiongguichou.content.entity.Comment;
 import com.qiongguichou.content.mapper.CommentMapper;
@@ -98,7 +99,10 @@ public class AdminReviewController {
     public Result<IPage<Report>> getReports(
             @RequestParam(defaultValue = "1") int pageNum,
             @RequestParam(defaultValue = "20") int pageSize,
-            @RequestParam(defaultValue = "PENDING") String status) {
+            @RequestParam(required = false) String status) {
+        if (status == null || status.isEmpty()) {
+            status = ReportStatus.PENDING.name();
+        }
         Page<Report> page = new Page<>(pageNum, pageSize);
         IPage<Report> result = reportMapper.selectPage(page,
                 new LambdaQueryWrapper<Report>()

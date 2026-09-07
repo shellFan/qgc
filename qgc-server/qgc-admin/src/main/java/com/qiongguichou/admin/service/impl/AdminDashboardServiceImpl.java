@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.qiongguichou.admin.service.AdminDashboardService;
 import com.qiongguichou.campaign.entity.Campaign;
 import com.qiongguichou.campaign.mapper.CampaignMapper;
+import com.qiongguichou.common.enums.CampaignStatus;
+import com.qiongguichou.common.enums.WithdrawStatus;
 import com.qiongguichou.content.mapper.ReportMapper;
 import com.qiongguichou.user.entity.User;
 import com.qiongguichou.user.mapper.UserMapper;
@@ -46,19 +48,19 @@ public class AdminDashboardServiceImpl implements AdminDashboardService {
 
         // 进行中筹款数
         Long activeCampaigns = campaignMapper.selectCount(
-                new LambdaQueryWrapper<Campaign>().eq(Campaign::getStatus, "ACTIVE")
+                new LambdaQueryWrapper<Campaign>().eq(Campaign::getStatus, CampaignStatus.ACTIVE.name())
         );
         result.put("activeCampaigns", activeCampaigns);
 
         // 待审核筹款数
         Long pendingCampaigns = campaignMapper.selectCount(
-                new LambdaQueryWrapper<Campaign>().eq(Campaign::getStatus, "PENDING_REVIEW")
+                new LambdaQueryWrapper<Campaign>().eq(Campaign::getStatus, CampaignStatus.PENDING_REVIEW.name())
         );
         result.put("pendingCampaigns", pendingCampaigns);
 
         // 待审核提现数
         Long pendingWithdraws = withdrawOrderMapper.selectCount(
-                new LambdaQueryWrapper<WithdrawOrder>().eq(WithdrawOrder::getStatus, "PENDING")
+                new LambdaQueryWrapper<WithdrawOrder>().eq(WithdrawOrder::getStatus, WithdrawStatus.PENDING.name())
         );
         result.put("pendingWithdraws", pendingWithdraws);
 
@@ -117,12 +119,12 @@ public class AdminDashboardServiceImpl implements AdminDashboardService {
         Map<String, Object> result = new HashMap<>();
 
         Long pendingCampaigns = campaignMapper.selectCount(
-                new LambdaQueryWrapper<Campaign>().eq(Campaign::getStatus, "PENDING_REVIEW")
+                new LambdaQueryWrapper<Campaign>().eq(Campaign::getStatus, CampaignStatus.PENDING_REVIEW.name())
         );
         result.put("pendingCampaigns", pendingCampaigns);
 
         Long pendingWithdraws = withdrawOrderMapper.selectCount(
-                new LambdaQueryWrapper<WithdrawOrder>().eq(WithdrawOrder::getStatus, "PENDING")
+                new LambdaQueryWrapper<WithdrawOrder>().eq(WithdrawOrder::getStatus, WithdrawStatus.PENDING.name())
         );
         result.put("pendingWithdraws", pendingWithdraws);
 
