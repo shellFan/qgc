@@ -2,14 +2,14 @@ version: '3.8'
 
 services:
   mysql:
-    image: mysql:8.0
+    image: mysql:5.6
     container_name: qgc-mysql
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-qgc_root_2024}
-      MYSQL_DATABASE: ${MYSQL_DATABASE:-qgc}
-      MYSQL_USER: ${MYSQL_USER:-qgc}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-qgc_pass_2024}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-qiongguichou_root_2024}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-qiongguichou}
+      MYSQL_USER: ${MYSQL_USER:-qiongguichou}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-qiongguichou_pass_2024}
     ports:
       - "3306:3306"
     volumes:
@@ -47,14 +47,14 @@ services:
       - "8080:8080"
     environment:
       SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-dev}
-      MYSQL_HOST: mysql
-      MYSQL_PORT: 3306
-      MYSQL_DB: ${MYSQL_DATABASE:-qgc}
-      MYSQL_USER: ${MYSQL_USER:-qgc}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-qgc_pass_2024}
-      REDIS_HOST: redis
-      REDIS_PORT: 6379
-      REDIS_PASSWORD: ${REDIS_PASSWORD:-qgc_redis_2024}
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/${MYSQL_DATABASE:-qiongguichou}?useUnicode=true&characterEncoding=utf8mb4&useSSL=false&serverTimezone=Asia/Shanghai
+      SPRING_DATASOURCE_USERNAME: ${MYSQL_USER:-qiongguichou}
+      SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD:-qiongguichou_pass_2024}
+      SPRING_REDIS_HOST: redis
+      SPRING_REDIS_PORT: 6379
+      SPRING_REDIS_PASSWORD: ${REDIS_PASSWORD:-qgc_redis_2024}
+      JWT_SECRET: ${JWT_SECRET:-qiongguichou2026secretkey_dev_only}
+      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-http://localhost}
     depends_on:
       mysql:
         condition: service_healthy

@@ -30,10 +30,10 @@ qgc/
 ## 技术栈
 
 ### 后端
-- Java 17 + Spring Boot 3.2
-- MyBatis-Plus 3.5
+- Java 8 + Spring Boot 2.7.18
+- MyBatis-Plus 3.5.x
 - Redisson (分布式锁)
-- MySQL 5.6+ / 8.0
+- MySQL 5.6
 - Redis
 - 微信支付 SDK
 
@@ -47,10 +47,10 @@ qgc/
 ## 快速开始
 
 ### 环境要求
-- JDK 17+
+- JDK 8+
 - Maven 3.8+
 - Node.js 18+
-- MySQL 5.6+ / 8.0
+- MySQL 5.6
 - Redis 6+
 
 ### 1. 数据库初始化

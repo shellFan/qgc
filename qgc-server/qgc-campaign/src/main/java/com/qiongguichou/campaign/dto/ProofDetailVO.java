@@ -3,6 +3,7 @@ package com.qiongguichou.campaign.dto;
 import lombok.Data;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -69,13 +70,13 @@ public class ProofDetailVO {
      * 筹款目标金额(元)
      */
     public BigDecimal getCampaignTargetAmountYuan() {
-        return campaignTargetAmount != null ? new BigDecimal(campaignTargetAmount).divide(new BigDecimal(100), 2, BigDecimal.ROUND_HALF_UP) : BigDecimal.ZERO;
+        return campaignTargetAmount != null ? new BigDecimal(campaignTargetAmount).divide(new BigDecimal(100), 2, RoundingMode.HALF_UP) : BigDecimal.ZERO;
     }
 
     /**
      * 筹款已筹金额(元)
      */
     public BigDecimal getCampaignRaisedAmountYuan() {
-        return campaignRaisedAmount != null ? new BigDecimal(campaignRaisedAmount).divide(new BigDecimal(100), 2, BigDecimal.ROUND_HALF_UP) : BigDecimal.ZERO;
+        return campaignRaisedAmount != null ? new BigDecimal(campaignRaisedAmount).divide(new BigDecimal(100), 2, RoundingMode.HALF_UP) : BigDecimal.ZERO;
     }
 }

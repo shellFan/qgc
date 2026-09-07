@@ -3,6 +3,7 @@ package com.qiongguichou.campaign.dto;
 import lombok.Data;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 
 /**
@@ -83,20 +84,20 @@ public class CampaignListVO {
      * 目标金额(元)
      */
     public BigDecimal getTargetAmountYuan() {
-        return targetAmount != null ? new BigDecimal(targetAmount).divide(new BigDecimal(100), 2, BigDecimal.ROUND_HALF_UP) : BigDecimal.ZERO;
+        return targetAmount != null ? new BigDecimal(targetAmount).divide(new BigDecimal(100), 2, RoundingMode.HALF_UP) : BigDecimal.ZERO;
     }
 
     /**
      * 已筹金额(元)
      */
     public BigDecimal getRaisedAmountYuan() {
-        return raisedAmount != null ? new BigDecimal(raisedAmount).divide(new BigDecimal(100), 2, BigDecimal.ROUND_HALF_UP) : BigDecimal.ZERO;
+        return raisedAmount != null ? new BigDecimal(raisedAmount).divide(new BigDecimal(100), 2, RoundingMode.HALF_UP) : BigDecimal.ZERO;
     }
 
     /**
      * 剩余金额(元)
      */
     public BigDecimal getRemainingAmountYuan() {
-        return remainingAmount != null ? new BigDecimal(remainingAmount).divide(new BigDecimal(100), 2, BigDecimal.ROUND_HALF_UP) : BigDecimal.ZERO;
+        return remainingAmount != null ? new BigDecimal(remainingAmount).divide(new BigDecimal(100), 2, RoundingMode.HALF_UP) : BigDecimal.ZERO;
     }
 }
