@@ -1,0 +1,75 @@
+# Staging环境配置
+# Staging环境接入真实微信/支付，但使用测试号/沙箱
+# 所有敏感配置通过环境变量注入，无硬编码默认值
+
+spring:
+  datasource:
+    url: ${SPRING_DATASOURCE_URL}  # 必须设置，无默认值
+    username: ${SPRING_DATASOURCE_USERNAME}  # 必须设置
+    password: ${SPRING_DATASOURCE_PASSWORD}  # 必须设置
+    hikari:
+      minimum-idle: 5
+      maximum-pool-size: 15
+      idle-timeout: 30000
+      max-lifetime: 1800000
+      connection-timeout: 30000
+  redis:
+    host: ${SPRING_REDIS_HOST}  # 必须设置
+    port: ${SPRING_REDIS_PORT:6379}
+    password: ${SPRING_REDIS_PASSWORD:}  # 可选，无密码留空
+    database: 1  # Staging使用DB1，与Dev(DB0)隔离
+
+# CORS - Staging环境配置具体域名
+cors:
+  allowed-origins: ${CORS_ALLOWED_ORIGINS}  # 必须设置，逗号分隔
+
+qgc:
+  jwt:
+    secret: ${JWT_SECRET}  # 必须设置，Staging专用密钥
+    user-expiration: 604800000  # 7天
+    admin-expiration: 86400000  # 1天
+
+  # 认证 - Staging禁止Mock登录
+  auth:
+    mock-enabled: false
+
+  # 文件上传
+  upload:
+    path: ${QGC_UPLOAD_PATH:/data/qgc/uploads/}
+    max-size: 5242880  # 5MB
+
+  # 微信公众号 - Staging使用测试号
+  wechat:
+    mock-enabled: false  # Staging接入真实微信
+    mp:
+      appId: ${WX_MP_APPID}  # 测试公众号AppID
+      secret: ${WX_MP_SECRET}  # 测试公众号Secret
+      token: ${WX_MP_TOKEN}  # 测试公众号Token
+      aesKey: ${WX_MP_AES_KEY:}  # 可选，消息加密
+
+  # 微信支付 - Staging使用沙箱环境
+  pay:
+    mock-enabled: false  # Staging接入真实微信支付
+    appId: ${WX_PAY_APPID}  # 测试公众号AppID
+    mchId: ${WX_PAY_MCH_ID}  # 测试商户号
+    mchKey: ${WX_PAY_MCH_KEY}  # 测试商户密钥
+    notifyUrl: ${WX_PAY_NOTIFY_URL}  # 必须设置，外网可访问的回调URL
+
+# Swagger - Staging环境开启(仅限内部访问)
+springfox:
+  documentation:
+    enabled: true
+    swagger-ui:
+      enabled: true
+
+# 日志 - Staging保留debug便于排查
+logging:
+  level:
+    com.qiongguichou: debug
+    com.baomidou.mybatisplus: info
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+  file:
+    name: /data/qgc/logs/qgc-staging.log
+    max-size: 50MB
+    max-history: 7

@@ -44,6 +44,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
                         "/api/proof/detail/**",
                         // 健康检查和版本
                         "/api/health",
+                        "/api/health/live",
+                        "/api/health/ready",
                         "/api/version",
                         // Swagger
                         "/swagger-resources/**",

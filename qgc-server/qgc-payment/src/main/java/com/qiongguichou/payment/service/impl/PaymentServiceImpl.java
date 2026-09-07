@@ -14,13 +14,13 @@ import com.qiongguichou.common.enums.CampaignStatus;
 import com.qiongguichou.common.enums.PaymentStatus;
 import com.qiongguichou.common.enums.RefundStatus;
 import com.qiongguichou.common.enums.SupportStatus;
+import com.qiongguichou.common.event.PaySuccessEvent;
 import com.qiongguichou.common.exception.BusinessException;
 import com.qiongguichou.common.result.ErrorCode;
 import com.qiongguichou.common.util.OrderNoUtil;
 import com.qiongguichou.common.util.UserContext;
 import com.qiongguichou.campaign.entity.Campaign;
 import com.qiongguichou.campaign.mapper.CampaignMapper;
-import com.qiongguichou.core.config.RedisService;
 import com.qiongguichou.payment.config.QgcWxPayConfig;
 import com.qiongguichou.payment.dto.PayRequest;
 import com.qiongguichou.payment.dto.PayResult;
@@ -35,6 +35,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -56,7 +57,7 @@ public class PaymentServiceImpl implements PaymentService {
     private final CampaignMapper campaignMapper;
     private final RedissonClient redissonClient;
     private final QgcWxPayConfig qgcWxPayConfig;
-    private final RedisService redisService;
+    private final ApplicationEventPublisher eventPublisher;
 
     /** 微信支付服务，Mock模式下为null */
     private WxPayService wxPayService;
@@ -405,8 +406,10 @@ public class PaymentServiceImpl implements PaymentService {
             }
         }
 
-        // 5. 清理筹款相关缓存
-        clearCampaignCache(paymentOrder.getCampaignId());
+        // 5. 发布支付成功事件(事务提交后处理钱包入账+缓存清理)
+        eventPublisher.publishEvent(new PaySuccessEvent(
+                this, paymentOrder.getCampaignId(), campaign.getCreatorUserId(),
+                paymentOrder.getSupporterUserId(), paidAmount, campaign.getTitle()));
     }
 
     /**
@@ -477,20 +480,4 @@ public class PaymentServiceImpl implements PaymentService {
         this.wxPayService = wxPayService;
     }
 
-    /**
-     * 清理筹款相关缓存(支付后调用)
-     * 使用deleteByPattern替代SCAN+循环DELETE
-     */
-    private void clearCampaignCache(Long campaignId) {
-        try {
-            // 清理详情缓存
-            redisService.delete("qgc:cache:campaign:detail:" + campaignId);
-            // 清理列表缓存(版本化递增, 无需SCAN)
-            redisService.increment("qgc:cache:campaign:list:version");
-            // 清理热门缓存(版本化递增, 无需SCAN)
-            redisService.increment("qgc:cache:campaign:hot:version");
-        } catch (Exception e) {
-            log.warn("清理筹款缓存失败, campaignId={}", campaignId, e);
-        }
     }
-}
