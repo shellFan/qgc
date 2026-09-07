@@ -13,12 +13,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 /**
- * 广告服务 - Redis统计优化
+ * 广告服务 - Redis统计优化(按日分区key+原子同步)
  */
 @Slf4j
 @Service
@@ -32,6 +34,7 @@ public class AdService {
 
     private static final String AD_VIEW_KEY = "qgc:ad:view:";
     private static final String AD_CLICK_KEY = "qgc:ad:click:";
+    private static final DateTimeFormatter DATE_FMT = DateTimeFormatter.ofPattern("yyyyMMdd");
 
     /**
      * 获取指定位置的广告列表
@@ -55,72 +58,81 @@ public class AdService {
     }
 
     /**
-     * 记录广告曝光(Redis)
+     * 记录广告曝光(Redis, 按日分区key)
      */
     public void recordImpression(Long adId) {
-        String key = AD_VIEW_KEY + adId;
+        String key = AD_VIEW_KEY + adId + ":" + LocalDate.now().format(DATE_FMT);
         redisService.increment(key);
-        // 设置7天过期
-        redisService.expire(key, 7, java.util.concurrent.TimeUnit.DAYS);
+        // 当日key次日过期(保留2天防跨日边界问题)
+        redisService.expire(key, 2, TimeUnit.DAYS);
     }
 
     /**
-     * 记录广告点击(Redis)
+     * 记录广告点击(Redis, 按日分区key)
      */
     public void recordClick(Long adId) {
-        String key = AD_CLICK_KEY + adId;
+        String key = AD_CLICK_KEY + adId + ":" + LocalDate.now().format(DATE_FMT);
         redisService.increment(key);
-        redisService.expire(key, 7, java.util.concurrent.TimeUnit.DAYS);
+        redisService.expire(key, 2, TimeUnit.DAYS);
     }
 
     /**
-     * 获取广告Redis中的统计数
+     * 获取广告当日Redis中的曝光数
      */
     public int getViewCount(Long adId) {
-        String key = AD_VIEW_KEY + adId;
+        String key = AD_VIEW_KEY + adId + ":" + LocalDate.now().format(DATE_FMT);
         String value = redisService.get(key);
         return value != null ? Integer.parseInt(value) : 0;
     }
 
     /**
-     * 获取广告Redis中的点击数
+     * 获取广告当日Redis中的点击数
      */
     public int getClickCount(Long adId) {
-        String key = AD_CLICK_KEY + adId;
+        String key = AD_CLICK_KEY + adId + ":" + LocalDate.now().format(DATE_FMT);
         String value = redisService.get(key);
         return value != null ? Integer.parseInt(value) : 0;
     }
 
     /**
      * 同步Redis广告统计到数据库(定时任务调用)
+     * 原子操作: 使用GETSET读取并清零Redis计数，再upsert到DB
      */
     public void syncAdStats() {
         LocalDate today = LocalDate.now();
+        String dateStr = today.format(DATE_FMT);
 
-        // 扫描所有曝光key
-        Set<String> viewKeys = redisService.getKeysByPattern(AD_VIEW_KEY + "*");
+        // 扫描当日曝光key
+        Set<String> viewKeys = redisService.getKeysByPattern(AD_VIEW_KEY + "*:" + dateStr);
         for (String viewKey : viewKeys) {
             try {
-                Long adId = Long.parseLong(viewKey.substring(AD_VIEW_KEY.length()));
-                int viewCount = getViewCount(adId);
-                int clickCount = getClickCount(adId);
+                // 解析adId: qgc:ad:view:{adId}:{dateStr}
+                String keyBody = viewKey.substring(AD_VIEW_KEY.length());
+                int lastColon = keyBody.lastIndexOf(':');
+                if (lastColon <= 0) continue;
+                Long adId = Long.parseLong(keyBody.substring(0, lastColon));
 
-                // 更新或插入当日统计
-                AdStat existing = adStatMapper.selectOne(
-                        new LambdaQueryWrapper<AdStat>()
-                                .eq(AdStat::getAdId, adId)
-                                .eq(AdStat::getStatDate, today));
-                if (existing != null) {
-                    existing.setImpressionCount(viewCount);
-                    existing.setClickCount(clickCount);
-                    adStatMapper.updateById(existing);
-                } else {
+                // 读取并清零曝光计数(原子操作: GET + DEL)
+                int viewCount = getViewCount(adId);
+                if (viewCount > 0) {
+                    redisService.delete(viewKey);
+                }
+
+                // 读取点击计数(同日)
+                int clickCount = getClickCount(adId);
+                String clickKey = AD_CLICK_KEY + adId + ":" + dateStr;
+                if (clickCount > 0) {
+                    redisService.delete(clickKey);
+                }
+
+                // 原子upsert到DB
+                if (viewCount > 0 || clickCount > 0) {
                     AdStat stat = new AdStat();
                     stat.setAdId(adId);
                     stat.setStatDate(today);
                     stat.setImpressionCount(viewCount);
                     stat.setClickCount(clickCount);
-                    adStatMapper.insert(stat);
+                    adStatMapper.upsertByAdAndDate(stat);
                 }
             } catch (Exception e) {
                 log.error("同步广告统计失败, key={}", viewKey, e);
@@ -165,5 +177,12 @@ public class AdService {
      */
     public void deleteAd(Long id) {
         adMapper.deleteById(id);
+    }
+
+    /**
+     * 根据ID获取广告
+     */
+    public Ad getById(Long id) {
+        return adMapper.selectById(id);
     }
 }

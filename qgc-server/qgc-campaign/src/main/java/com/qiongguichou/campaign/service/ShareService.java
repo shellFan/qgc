@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 分享裂变服务
@@ -22,6 +23,10 @@ public class ShareService {
 
     private final ShareRecordMapper shareRecordMapper;
     private final RedisService redisService;
+
+    /** 访客去重Redis key前缀, TTL 24h */
+    private static final String VISIT_DEDUP_KEY = "qgc:share:visit:";
+    private static final long VISIT_DEDUP_TTL_HOURS = 24;
 
     /**
      * 记录分享行为
@@ -44,27 +49,53 @@ public class ShareService {
     }
 
     /**
-     * 通过分享码访问(记录访客)
+     * 通过分享码访问(记录访客，Redis 24h去重)
+     * @param shareCode 分享码
+     * @param visitorKey 访客标识(userId或匿名visitorId)
      */
-    public void trackVisit(String shareCode) {
+    public void trackVisit(String shareCode, String visitorKey) {
+        if (visitorKey == null || visitorKey.isEmpty()) {
+            // 无访客标识则无法去重，使用IP作为兜底
+            visitorKey = "ip:" + (UserContext.getIp() != null ? UserContext.getIp() : UUID.randomUUID().toString());
+        }
+
+        // Redis去重: 同一访客对同一分享码24h内只计1次
+        String dedupKey = VISIT_DEDUP_KEY + shareCode + ":" + visitorKey;
+        String existing = redisService.get(dedupKey);
+        if (existing != null) {
+            log.debug("访客去重跳过: shareCode={}, visitorKey={}", shareCode, visitorKey);
+            return;
+        }
+
         ShareRecord record = shareRecordMapper.selectOne(
                 new LambdaQueryWrapper<ShareRecord>().eq(ShareRecord::getShareCode, shareCode));
         if (record != null) {
             record.setVisitorCount(record.getVisitorCount() + 1);
             shareRecordMapper.updateById(record);
+            // 设置去重标记
+            redisService.set(dedupKey, "1", VISIT_DEDUP_TTL_HOURS, TimeUnit.HOURS);
         }
     }
 
     /**
-     * 通过分享码投喂(记录支持)
+     * 通过分享码投喂(记录支持，同一supportOrder只计1次)
      */
-    public void trackSupport(String shareCode, long amountFen) {
+    public void trackSupport(String shareCode, long amountFen, String supportNo) {
+        // Redis去重: 同一支持订单对同一分享码只计1次
+        String dedupKey = "qgc:share:support:" + shareCode + ":" + supportNo;
+        String existing = redisService.get(dedupKey);
+        if (existing != null) {
+            return;
+        }
+
         ShareRecord record = shareRecordMapper.selectOne(
                 new LambdaQueryWrapper<ShareRecord>().eq(ShareRecord::getShareCode, shareCode));
         if (record != null) {
             record.setSupportCount(record.getSupportCount() + 1);
             record.setSupportAmount(record.getSupportAmount() + amountFen);
             shareRecordMapper.updateById(record);
+            // 设置去重标记，7天过期
+            redisService.set(dedupKey, "1", 7, TimeUnit.DAYS);
         }
     }
 

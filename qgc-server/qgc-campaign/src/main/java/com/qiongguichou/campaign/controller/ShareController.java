@@ -38,8 +38,10 @@ public class ShareController {
      * 通过分享码访问
      */
     @PostMapping("/visit/{shareCode}")
-    public Result<Void> trackVisit(@PathVariable String shareCode) {
-        shareService.trackVisit(shareCode);
+    public Result<Void> trackVisit(
+            @PathVariable String shareCode,
+            @RequestParam(required = false) String visitorKey) {
+        shareService.trackVisit(shareCode, visitorKey);
         return Result.success();
     }
 

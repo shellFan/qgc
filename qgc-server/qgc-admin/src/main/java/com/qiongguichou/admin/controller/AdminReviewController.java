@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.qiongguichou.admin.service.AdminCampaignService;
 import com.qiongguichou.campaign.entity.Campaign;
 import com.qiongguichou.campaign.mapper.CampaignMapper;
+import com.qiongguichou.common.enums.CampaignStatus;
 import com.qiongguichou.common.result.Result;
 import com.qiongguichou.content.entity.Comment;
 import com.qiongguichou.content.mapper.CommentMapper;
@@ -19,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
  * 后台-审核中心Controller
  */
 @RestController
-@RequestMapping("/admin/review")
+@RequestMapping("/admin/api/review")
 @RequiredArgsConstructor
 public class AdminReviewController {
 
@@ -38,7 +39,7 @@ public class AdminReviewController {
         Page<Campaign> page = new Page<>(pageNum, pageSize);
         IPage<Campaign> result = campaignMapper.selectPage(page,
                 new LambdaQueryWrapper<Campaign>()
-                        .eq(Campaign::getStatus, "PENDING")
+                        .eq(Campaign::getStatus, CampaignStatus.PENDING_REVIEW.name())
                         .orderByAsc(Campaign::getCreateTime));
         return Result.success(result);
     }

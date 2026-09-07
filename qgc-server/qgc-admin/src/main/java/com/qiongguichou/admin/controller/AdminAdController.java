@@ -13,7 +13,7 @@ import java.util.List;
  * 后台-广告管理Controller
  */
 @RestController
-@RequestMapping("/admin/ad")
+@RequestMapping("/admin/api/ad")
 @RequiredArgsConstructor
 public class AdminAdController {
 
@@ -67,10 +67,7 @@ public class AdminAdController {
      */
     @PutMapping("/{id}/toggle")
     public Result<Void> toggleAd(@PathVariable Long id) {
-        Ad ad = adService.getAllAds().stream()
-                .filter(a -> a.getId().equals(id))
-                .findFirst()
-                .orElse(null);
+        Ad ad = adService.getById(id);
         if (ad != null) {
             ad.setEnabled(ad.getEnabled() == 1 ? 0 : 1);
             adService.updateAd(ad);

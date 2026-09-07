@@ -50,22 +50,15 @@ public class UserLevelService {
     }
 
     /**
-     * 增加经验值并自动升级
+     * 增加经验值并自动升级(原子SQL更新，无竞态)
      */
     @Transactional(rollbackFor = Exception.class)
     public UserLevel addExp(Long userId, int exp) {
-        UserLevel level = getUserLevel(userId);
-        level.setExp(level.getExp() + exp);
-        // 检查升级
-        for (int i = LEVEL_EXP.length - 1; i >= 0; i--) {
-            if (level.getExp() >= LEVEL_EXP[i] && level.getLevel() < i + 1) {
-                level.setLevel(i + 1);
-                level.setTitle(LEVEL_NAME[i]);
-                break;
-            }
-        }
-        userLevelMapper.updateById(level);
-        return level;
+        // 先确保用户等级记录存在
+        getUserLevel(userId);
+        // 原子更新经验值+自动升级
+        userLevelMapper.addExpAtomic(userId, exp);
+        return getUserLevel(userId);
     }
 
     /**
@@ -78,24 +71,23 @@ public class UserLevelService {
     }
 
     /**
-     * 授予徽章(幂等)
+     * 授予徽章(幂等: 利用uk_user_badge唯一约束，并发安全)
      */
     public boolean awardBadge(Long userId, String badgeCode, String badgeName, String badgeIcon) {
-        Long count = userBadgeMapper.selectCount(
-                new LambdaQueryWrapper<UserBadge>()
-                        .eq(UserBadge::getUserId, userId)
-                        .eq(UserBadge::getBadgeCode, badgeCode));
-        if (count > 0) {
-            return false; // 已有该徽章
+        try {
+            UserBadge badge = new UserBadge();
+            badge.setUserId(userId);
+            badge.setBadgeCode(badgeCode);
+            badge.setBadgeName(badgeName);
+            badge.setBadgeIcon(badgeIcon);
+            badge.setEarnedTime(LocalDateTime.now());
+            userBadgeMapper.insert(badge);
+            return true;
+        } catch (org.springframework.dao.DuplicateKeyException e) {
+            // uk_user_badge唯一约束兜底，已有该徽章
+            log.debug("徽章已存在，跳过: userId={}, badgeCode={}", userId, badgeCode);
+            return false;
         }
-        UserBadge badge = new UserBadge();
-        badge.setUserId(userId);
-        badge.setBadgeCode(badgeCode);
-        badge.setBadgeName(badgeName);
-        badge.setBadgeIcon(badgeIcon);
-        badge.setEarnedTime(LocalDateTime.now());
-        userBadgeMapper.insert(badge);
-        return true;
     }
 
     /**
@@ -111,10 +103,23 @@ public class UserLevelService {
     }
 
     /**
-     * 增加积分
+     * 增加积分(幂等: type+relatedId唯一，重复调用不会重复加积分)
      */
     @Transactional(rollbackFor = Exception.class)
     public UserPoints addPoints(Long userId, int amount, String type, String relatedId, String remark) {
+        // 幂等检查: 同一类型+同一关联ID的积分不重复发放
+        if (relatedId != null && !relatedId.isEmpty()) {
+            Long existCount = pointsFlowMapper.selectCount(
+                    new LambdaQueryWrapper<PointsFlow>()
+                            .eq(PointsFlow::getUserId, userId)
+                            .eq(PointsFlow::getType, type)
+                            .eq(PointsFlow::getRelatedId, relatedId));
+            if (existCount > 0) {
+                log.info("积分幂等跳过: userId={}, type={}, relatedId={}", userId, type, relatedId);
+                return getUserPoints(userId);
+            }
+        }
+
         UserPoints points = getUserPoints(userId);
         points.setPoints(points.getPoints() + amount);
         points.setTotalEarned(points.getTotalEarned() + amount);
