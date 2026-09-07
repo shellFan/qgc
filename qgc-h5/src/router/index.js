@@ -12,6 +12,12 @@ const routes = [
         meta: { title: '穷鬼筹' }
       },
       {
+        path: 'ranking',
+        name: 'RankingTab',
+        component: () => import('@/views/Ranking.vue'),
+        meta: { title: '排行榜' }
+      },
+      {
         path: 'my',
         name: 'My',
         component: () => import('@/views/My.vue'),
@@ -66,6 +72,24 @@ const routes = [
     name: 'ProofCreate',
     component: () => import('@/views/ProofCreate.vue'),
     meta: { title: '发布返图' }
+  },
+  {
+    path: '/pay-success',
+    name: 'PaySuccess',
+    component: () => import('@/views/PaySuccess.vue'),
+    meta: { title: '投喂成功' }
+  },
+  {
+    path: '/profile',
+    name: 'UserProfile',
+    component: () => import('@/views/UserProfile.vue'),
+    meta: { title: '个人主页' }
+  },
+  {
+    path: '/profile/:userId',
+    name: 'UserProfileOther',
+    component: () => import('@/views/UserProfile.vue'),
+    meta: { title: '用户主页' }
   },
   {
     path: '/login',

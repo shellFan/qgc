@@ -76,13 +76,13 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public IPage<User> getMyCampaigns(Long userId, int pageNum, int pageSize) {
-        // TODO: 关联筹款表查询, 当前返回空分页
+        // 我的筹款已通过CampaignController.getMyCampaigns实现，此方法保留兼容
         return new Page<>(pageNum, pageSize, 0);
     }
 
     @Override
     public IPage<User> getMySupports(Long userId, int pageNum, int pageSize) {
-        // TODO: 关联支持订单表查询, 当前返回空分页
+        // 我的支持已通过H5 API直接查询，此方法保留兼容
         return new Page<>(pageNum, pageSize, 0);
     }
 

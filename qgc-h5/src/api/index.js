@@ -55,3 +55,28 @@ export const createReport = (data) => request.post('/api/report', data)
 // ====== 微信 ======
 export const getWechatShareConfig = (params) => request.get('/api/wechat/share/config', { params })
 export const getQrcode = (params) => request.get('/api/wechat/qrcode', { params })
+
+// ====== 排行榜 ======
+export const getRanking = (type) => request.get(`/api/ranking/${type}`)
+export const getRankingHistory = (type, params) => request.get(`/api/ranking/${type}/history`, { params })
+
+// ====== 分享 ======
+export const recordShare = (data) => request.post('/api/share', data)
+export const trackShareVisit = (data) => request.post('/api/share/visit', data)
+export const getShareStats = (campaignId) => request.get(`/api/share/stats/${campaignId}`)
+
+// ====== 用户等级/徽章/积分 ======
+export const getUserLevel = (userId) => request.get(`/api/user/level/${userId}`)
+export const getMyLevel = () => request.get('/api/user/level/mine')
+export const getUserBadges = (userId) => request.get(`/api/user/badges/${userId}`)
+export const getMyBadges = () => request.get('/api/user/badges/mine')
+export const getUserPoints = (userId) => request.get(`/api/user/points/${userId}`)
+export const getMyPoints = () => request.get('/api/user/points/mine')
+export const getMyPointsFlow = (params) => request.get('/api/user/points/mine/flow', { params })
+export const getUserProfile = (userId) => request.get(`/api/user/profile/${userId}`)
+export const getMyProfile = () => request.get('/api/user/profile/mine')
+
+// ====== 广告 ======
+export const getAdsByPosition = (code) => request.get(`/api/ad/position/${code}`)
+export const recordAdImpression = (adId) => request.post(`/api/ad/${adId}/impression`)
+export const recordAdClick = (adId) => request.post(`/api/ad/${adId}/click`)

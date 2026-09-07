@@ -36,6 +36,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -56,6 +57,14 @@ public class CampaignServiceImpl implements CampaignService {
     private static final Set<Integer> VALID_DURATION_HOURS = new HashSet<>(Arrays.asList(24, 48, 72));
     private static final long MIN_TARGET_AMOUNT_FEN = 1L;
     private static final long MAX_TARGET_AMOUNT_FEN = 10000L;
+
+    // 缓存Key前缀
+    private static final String CACHE_CAMPAIGN_DETAIL = "qgc:cache:campaign:detail:";
+    private static final String CACHE_CAMPAIGN_LIST = "qgc:cache:campaign:list:";
+    private static final String CACHE_HOT_LIST = "qgc:cache:campaign:hot";
+    private static final long CACHE_DETAIL_TTL_MINUTES = 10;
+    private static final long CACHE_LIST_TTL_MINUTES = 5;
+    private static final long CACHE_HOT_TTL_MINUTES = 3;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -125,11 +134,31 @@ public class CampaignServiceImpl implements CampaignService {
             imageList.forEach(campaignImageMapper::insert);
         }
 
+        // 清理列表缓存和热门缓存
+        clearListCache();
+        clearHotCache();
+
         return getById(campaign.getId());
     }
 
     @Override
     public CampaignDetailVO getById(Long id) {
+        // 尝试从Redis缓存读取
+        try {
+            String cacheKey = CACHE_CAMPAIGN_DETAIL + id;
+            String cached = redisService.get(cacheKey);
+            if (cached != null) {
+                com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+                mapper.registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
+                CampaignDetailVO cachedVo = mapper.readValue(cached, CampaignDetailVO.class);
+                // 缓存命中，仍增加浏览量
+                redisService.incrementViewCount(id);
+                return cachedVo;
+            }
+        } catch (Exception e) {
+            log.warn("读取筹款详情缓存失败, id={}", id, e);
+        }
+
         Campaign campaign = campaignMapper.selectById(id);
         if (campaign == null) {
             throw new BusinessException(ErrorCode.CAMPAIGN_NOT_FOUND);
@@ -207,6 +236,17 @@ public class CampaignServiceImpl implements CampaignService {
             }
         }
 
+        // 写入Redis缓存
+        try {
+            String cacheKey = CACHE_CAMPAIGN_DETAIL + id;
+            com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+            mapper.registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
+            String json = mapper.writeValueAsString(vo);
+            redisService.set(cacheKey, json, CACHE_DETAIL_TTL_MINUTES, TimeUnit.MINUTES);
+        } catch (Exception e) {
+            log.warn("写入筹款详情缓存失败, id={}", id, e);
+        }
+
         // Redis增加浏览量
         redisService.incrementViewCount(id);
 
@@ -215,6 +255,21 @@ public class CampaignServiceImpl implements CampaignService {
 
     @Override
     public IPage<CampaignListVO> getList(int pageNum, int pageSize, String sort, Long categoryId, String keyword) {
+        // 首页列表(无keyword)才走缓存
+        if (keyword == null || keyword.isEmpty()) {
+            try {
+                String cacheKey = CACHE_CAMPAIGN_LIST + pageNum + ":" + pageSize + ":" + sort + ":" + (categoryId != null ? categoryId : 0);
+                String cached = redisService.get(cacheKey);
+                if (cached != null) {
+                    com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+                    mapper.registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
+                    return mapper.readValue(cached, new com.fasterxml.jackson.core.type.TypeReference<Page<CampaignListVO>>() {});
+                }
+            } catch (Exception e) {
+                log.warn("读取筹款列表缓存失败", e);
+            }
+        }
+
         Page<CampaignListVO> page = new Page<>(pageNum, pageSize);
         IPage<CampaignListVO> result = campaignMapper.selectCampaignList(page, null, "ACTIVE", categoryId, keyword, sort);
 
@@ -223,15 +278,53 @@ public class CampaignServiceImpl implements CampaignService {
             fillCalculatedFields(vo);
         }
 
+        // 首页列表(无keyword)写入缓存
+        if (keyword == null || keyword.isEmpty()) {
+            try {
+                String cacheKey = CACHE_CAMPAIGN_LIST + pageNum + ":" + pageSize + ":" + sort + ":" + (categoryId != null ? categoryId : 0);
+                com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+                mapper.registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
+                String json = mapper.writeValueAsString(result);
+                redisService.set(cacheKey, json, CACHE_LIST_TTL_MINUTES, TimeUnit.MINUTES);
+            } catch (Exception e) {
+                log.warn("写入筹款列表缓存失败", e);
+            }
+        }
+
         return result;
     }
 
     @Override
     public List<CampaignListVO> getHotList(int limit) {
+        // 尝试从缓存读取
+        try {
+            String cacheKey = CACHE_HOT_LIST + ":" + limit;
+            String cached = redisService.get(cacheKey);
+            if (cached != null) {
+                com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+                mapper.registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
+                return mapper.readValue(cached, new com.fasterxml.jackson.core.type.TypeReference<List<CampaignListVO>>() {});
+            }
+        } catch (Exception e) {
+            log.warn("读取热门筹款缓存失败", e);
+        }
+
         List<CampaignListVO> list = campaignMapper.selectHotCampaigns(limit);
         for (CampaignListVO vo : list) {
             fillCalculatedFields(vo);
         }
+
+        // 写入缓存
+        try {
+            String cacheKey = CACHE_HOT_LIST + ":" + limit;
+            com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+            mapper.registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
+            String json = mapper.writeValueAsString(list);
+            redisService.set(cacheKey, json, CACHE_HOT_TTL_MINUTES, TimeUnit.MINUTES);
+        } catch (Exception e) {
+            log.warn("写入热门筹款缓存失败", e);
+        }
+
         return list;
     }
 
@@ -258,6 +351,11 @@ public class CampaignServiceImpl implements CampaignService {
         campaign.setCloseReason(XssUtil.clean(closeReason));
         campaign.setUpdateBy(userId);
         campaignMapper.updateById(campaign);
+
+        // 清理缓存
+        clearDetailCache(id);
+        clearListCache();
+        clearHotCache();
     }
 
     @Override
@@ -350,6 +448,11 @@ public class CampaignServiceImpl implements CampaignService {
         }
 
         campaignMapper.updateById(campaign);
+
+        // 清理缓存
+        clearDetailCache(id);
+        clearListCache();
+        clearHotCache();
     }
 
     /**
@@ -375,5 +478,57 @@ public class CampaignServiceImpl implements CampaignService {
         } else {
             vo.setRemainingTime(0L);
         }
+    }
+
+    /**
+     * 清理筹款详情缓存
+     */
+    public void clearDetailCache(Long campaignId) {
+        try {
+            redisService.delete(CACHE_CAMPAIGN_DETAIL + campaignId);
+        } catch (Exception e) {
+            log.warn("清理筹款详情缓存失败, id={}", campaignId, e);
+        }
+    }
+
+    /**
+     * 清理列表缓存(按模式删除)
+     */
+    public void clearListCache() {
+        try {
+            Set<String> keys = redisService.getKeysByPattern(CACHE_CAMPAIGN_LIST + "*");
+            if (keys != null && !keys.isEmpty()) {
+                for (String key : keys) {
+                    redisService.delete(key);
+                }
+            }
+        } catch (Exception e) {
+            log.warn("清理筹款列表缓存失败", e);
+        }
+    }
+
+    /**
+     * 清理热门缓存
+     */
+    public void clearHotCache() {
+        try {
+            Set<String> keys = redisService.getKeysByPattern(CACHE_HOT_LIST + "*");
+            if (keys != null && !keys.isEmpty()) {
+                for (String key : keys) {
+                    redisService.delete(key);
+                }
+            }
+        } catch (Exception e) {
+            log.warn("清理热门筹款缓存失败", e);
+        }
+    }
+
+    /**
+     * 清理指定筹款的所有相关缓存(供支付后调用)
+     */
+    public void clearCampaignCache(Long campaignId) {
+        clearDetailCache(campaignId);
+        clearListCache();
+        clearHotCache();
     }
 }

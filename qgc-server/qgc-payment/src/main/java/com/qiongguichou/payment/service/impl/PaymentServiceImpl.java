@@ -18,6 +18,7 @@ import com.qiongguichou.common.util.OrderNoUtil;
 import com.qiongguichou.common.util.UserContext;
 import com.qiongguichou.campaign.entity.Campaign;
 import com.qiongguichou.campaign.mapper.CampaignMapper;
+import com.qiongguichou.core.config.RedisService;
 import com.qiongguichou.payment.config.QgcWxPayConfig;
 import com.qiongguichou.payment.dto.PayRequest;
 import com.qiongguichou.payment.dto.PayResult;
@@ -53,6 +54,7 @@ public class PaymentServiceImpl implements PaymentService {
     private final CampaignMapper campaignMapper;
     private final RedissonClient redissonClient;
     private final QgcWxPayConfig qgcWxPayConfig;
+    private final RedisService redisService;
 
     /** 微信支付服务，Mock模式下为null */
     private WxPayService wxPayService;
@@ -389,6 +391,9 @@ public class PaymentServiceImpl implements PaymentService {
                 campaignMapper.updateById(update);
             }
         }
+
+        // 5. 清理筹款相关缓存
+        clearCampaignCache(paymentOrder.getCampaignId());
     }
 
     /**
@@ -457,5 +462,31 @@ public class PaymentServiceImpl implements PaymentService {
     @org.springframework.beans.factory.annotation.Autowired(required = false)
     public void setWxPayService(WxPayService wxPayService) {
         this.wxPayService = wxPayService;
+    }
+
+    /**
+     * 清理筹款相关缓存(支付后调用)
+     */
+    private void clearCampaignCache(Long campaignId) {
+        try {
+            // 清理详情缓存
+            redisService.delete("qgc:cache:campaign:detail:" + campaignId);
+            // 清理列表缓存
+            java.util.Set<String> listKeys = redisService.getKeysByPattern("qgc:cache:campaign:list:*");
+            if (listKeys != null) {
+                for (String key : listKeys) {
+                    redisService.delete(key);
+                }
+            }
+            // 清理热门缓存
+            java.util.Set<String> hotKeys = redisService.getKeysByPattern("qgc:cache:campaign:hot*");
+            if (hotKeys != null) {
+                for (String key : hotKeys) {
+                    redisService.delete(key);
+                }
+            }
+        } catch (Exception e) {
+            log.warn("清理筹款缓存失败, campaignId={}", campaignId, e);
+        }
     }
 }

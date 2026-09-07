@@ -31,3 +31,24 @@ export const approveWithdraw = (id) => request.post(`/admin/api/withdraws/${id}/
 export const rejectWithdraw = (id, data) => request.post(`/admin/api/withdraws/${id}/reject`, data)
 export const markWithdrawPaid = (id) => request.post(`/admin/api/withdraws/${id}/paid`)
 export const markWithdrawPayFail = (id) => request.post(`/admin/api/withdraws/${id}/pay-fail`)
+
+// ====== 审核中心 ======
+export const getReviewCampaigns = (params) => request.get('/admin/review/campaigns', { params })
+export const reviewCampaign = (id, data) => request.post(`/admin/review/campaign/${id}`, data)
+export const getReviewComments = (params) => request.get('/admin/review/comments', { params })
+export const reviewComment = (id, data) => request.post(`/admin/review/comment/${id}`, data)
+export const getReports = (params) => request.get('/admin/review/reports', { params })
+export const handleReport = (id) => request.post(`/admin/review/report/${id}`)
+
+// ====== 广告管理 ======
+export const getAdList = () => request.get('/admin/ad/list')
+export const createAd = (data) => request.post('/admin/ad', data)
+export const updateAd = (id, data) => request.put(`/admin/ad/${id}`, data)
+export const deleteAd = (id) => request.delete(`/admin/ad/${id}`)
+export const toggleAd = (id) => request.post(`/admin/ad/${id}/toggle`)
+
+// ====== 风控配置 ======
+export const getRiskConfig = () => request.get('/admin/risk/config')
+export const updateRiskConfig = (data) => request.post('/admin/risk/config', data)
+export const getRiskRecords = (params) => request.get('/admin/risk/records', { params })
+export const handleRiskRecord = (id) => request.post(`/admin/risk/record/${id}`)

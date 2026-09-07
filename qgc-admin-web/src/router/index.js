@@ -15,7 +15,10 @@ const routes = [
       { path: 'dashboard', name: 'Dashboard', component: () => import('@/views/Dashboard.vue'), meta: { title: '仪表盘' } },
       { path: 'campaigns', name: 'Campaigns', component: () => import('@/views/Campaigns.vue'), meta: { title: '筹款管理' } },
       { path: 'users', name: 'Users', component: () => import('@/views/Users.vue'), meta: { title: '用户管理' } },
-      { path: 'withdraws', name: 'Withdraws', component: () => import('@/views/Withdraws.vue'), meta: { title: '提现审核' } }
+      { path: 'withdraws', name: 'Withdraws', component: () => import('@/views/Withdraws.vue'), meta: { title: '提现审核' } },
+      { path: 'review', name: 'Review', component: () => import('@/views/Review.vue'), meta: { title: '审核中心' } },
+      { path: 'ads', name: 'Ads', component: () => import('@/views/Ads.vue'), meta: { title: '广告管理' } },
+      { path: 'risk', name: 'Risk', component: () => import('@/views/Risk.vue'), meta: { title: '风控配置' } }
     ]
   }
 ]

@@ -30,5 +30,11 @@
             <groupId>com.qiongguichou</groupId>
             <artifactId>qgc-payment</artifactId>
         </dependency>
+
+        <!-- qgc-content(广告统计同步Job) -->
+        <dependency>
+            <groupId>com.qiongguichou</groupId>
+            <artifactId>qgc-content</artifactId>
+        </dependency>
     </dependencies>
 </project>

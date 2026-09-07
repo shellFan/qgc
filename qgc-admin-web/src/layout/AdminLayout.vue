@@ -11,6 +11,10 @@
           <el-icon><Tickets /></el-icon>
           <span>筹款管理</span>
         </el-menu-item>
+        <el-menu-item index="/review">
+          <el-icon><CircleCheck /></el-icon>
+          <span>审核中心</span>
+        </el-menu-item>
         <el-menu-item index="/users">
           <el-icon><User /></el-icon>
           <span>用户管理</span>
@@ -18,6 +22,14 @@
         <el-menu-item index="/withdraws">
           <el-icon><Money /></el-icon>
           <span>提现审核</span>
+        </el-menu-item>
+        <el-menu-item index="/ads">
+          <el-icon><Picture /></el-icon>
+          <span>广告管理</span>
+        </el-menu-item>
+        <el-menu-item index="/risk">
+          <el-icon><Warning /></el-icon>
+          <span>风控配置</span>
         </el-menu-item>
       </el-menu>
     </el-aside>

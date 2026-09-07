@@ -4,7 +4,8 @@
       <router-view />
     </div>
     <van-tabbar v-model="active" route active-color="#ff4500" inactive-color="#999">
-      <van-tabbar-item to="/" icon="home-o">广场</van-tabbar-item>
+      <van-tabbar-item to="/" icon="home-o">首页</van-tabbar-item>
+      <van-tabbar-item to="/ranking" icon="bar-chart-o">排行</van-tabbar-item>
       <van-tabbar-item to="/my" icon="user-o">我的</van-tabbar-item>
     </van-tabbar>
   </div>

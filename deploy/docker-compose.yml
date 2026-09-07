@@ -55,6 +55,17 @@ services:
       SPRING_REDIS_PASSWORD: ${REDIS_PASSWORD:-qgc_redis_2024}
       JWT_SECRET: ${JWT_SECRET:-qiongguichou2026secretkey_dev_only}
       CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-http://localhost}
+      WECHAT_APPID: ${WECHAT_APPID:-}
+      WECHAT_SECRET: ${WECHAT_SECRET:-}
+      WECHAT_MCHID: ${WECHAT_MCHID:-}
+      WECHAT_API_KEY: ${WECHAT_API_KEY:-}
+      MOCK_PAY_ENABLED: ${MOCK_PAY_ENABLED:-true}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
     depends_on:
       mysql:
         condition: service_healthy
