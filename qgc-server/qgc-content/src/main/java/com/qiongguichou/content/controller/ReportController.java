@@ -1,5 +1,6 @@
 package com.qiongguichou.content.controller;
 
+import com.qiongguichou.common.enums.ReportStatus;
 import com.qiongguichou.common.result.Result;
 import com.qiongguichou.common.util.UserContext;
 import com.qiongguichou.content.entity.Report;
@@ -29,7 +30,7 @@ public class ReportController {
         report.setTargetId(request.getTargetId());
         report.setReporterUserId(userId);
         report.setReasonType(request.getReason());
-        report.setStatus("PENDING");
+        report.setStatus(ReportStatus.PENDING.name());
         reportMapper.insert(report);
         return Result.success(null);
     }

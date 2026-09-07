@@ -42,6 +42,9 @@ public class WebMvcConfig implements WebMvcConfigurer {
                         "/api/campaign/hot",
                         "/api/campaign/category/list",
                         "/api/proof/detail/**",
+                        // 健康检查和版本
+                        "/api/health",
+                        "/api/version",
                         // Swagger
                         "/swagger-resources/**",
                         "/webjars/**",

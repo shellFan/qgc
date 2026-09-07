@@ -12,6 +12,8 @@ import com.github.binarywang.wxpay.bean.result.enums.TradeTypeEnum;
 import com.github.binarywang.wxpay.service.WxPayService;
 import com.qiongguichou.common.enums.CampaignStatus;
 import com.qiongguichou.common.enums.PaymentStatus;
+import com.qiongguichou.common.enums.RefundStatus;
+import com.qiongguichou.common.enums.SupportStatus;
 import com.qiongguichou.common.exception.BusinessException;
 import com.qiongguichou.common.result.ErrorCode;
 import com.qiongguichou.common.util.OrderNoUtil;
@@ -115,7 +117,7 @@ public class PaymentServiceImpl implements PaymentService {
             supportOrder.setMessage(request.getMessage());
             supportOrder.setAnonymous(request.getAnonymous() != null ? request.getAnonymous() : 0);
             supportOrder.setHideAmount(0);
-            supportOrder.setStatus("CREATED");
+            supportOrder.setStatus(SupportStatus.CREATED.name());
             supportOrderMapper.insert(supportOrder);
 
             // 4. 创建支付订单
@@ -215,13 +217,24 @@ public class PaymentServiceImpl implements PaymentService {
                 return "FAIL";
             }
 
-            // 更新支付订单
-            paymentOrder.setStatus(PaymentStatus.SUCCESS.name());
-            paymentOrder.setEffectiveAmount(paidAmount);
-            paymentOrder.setTransactionId(result.getTransactionId());
-            paymentOrder.setPayTime(LocalDateTime.now());
-            paymentOrder.setNotifyTime(LocalDateTime.now());
-            paymentOrderMapper.updateById(paymentOrder);
+            // 更新支付订单(DB条件更新: WHERE status IN ('CREATED','PAYING') 保证只有一个线程入账)
+            LambdaUpdateWrapper<PaymentOrder> updateWrapper = new LambdaUpdateWrapper<>();
+            updateWrapper.eq(PaymentOrder::getId, paymentOrder.getId())
+                    .in(PaymentOrder::getStatus, PaymentStatus.CREATED.name(), PaymentStatus.PAYING.name())
+                    .set(PaymentOrder::getStatus, PaymentStatus.SUCCESS.name())
+                    .set(PaymentOrder::getEffectiveAmount, paidAmount)
+                    .set(PaymentOrder::getTransactionId, result.getTransactionId())
+                    .set(PaymentOrder::getPayTime, LocalDateTime.now())
+                    .set(PaymentOrder::getNotifyTime, LocalDateTime.now());
+            int rows = paymentOrderMapper.update(null, updateWrapper);
+            if (rows == 0) {
+                // 并发场景下其他线程已处理, 直接返回成功
+                log.info("支付回调并发跳过: orderId={}", paymentOrder.getId());
+                return "SUCCESS";
+            }
+
+            // 重新查询更新后的订单
+            paymentOrder = paymentOrderMapper.selectById(paymentOrder.getId());
 
             // 处理支付成功
             processPaySuccess(paymentOrder);
@@ -257,11 +270,11 @@ public class PaymentServiceImpl implements PaymentService {
             }
 
             if ("SUCCESS".equals(result.getRefundStatus())) {
-                refundOrder.setStatus("SUCCESS");
+                refundOrder.setStatus(RefundStatus.SUCCESS.name());
                 refundOrder.setWechatRefundId(result.getTransactionId());
                 refundOrder.setRefundTime(LocalDateTime.now());
             } else {
-                refundOrder.setStatus("FAIL");
+                refundOrder.setStatus(RefundStatus.FAIL.name());
             }
             refundOrderMapper.updateById(refundOrder);
 
@@ -291,7 +304,7 @@ public class PaymentServiceImpl implements PaymentService {
         refundOrder.setAmount(refundAmount);
         refundOrder.setReason(reason);
         refundOrder.setType("OVERPAY");
-        refundOrder.setStatus("PENDING");
+        refundOrder.setStatus(RefundStatus.PENDING.name());
         refundOrderMapper.insert(refundOrder);
 
         // 更新支付订单状态
@@ -300,7 +313,7 @@ public class PaymentServiceImpl implements PaymentService {
 
         // 调用微信退款或Mock
         if (qgcWxPayConfig.isMockEnabled()) {
-            refundOrder.setStatus("SUCCESS");
+            refundOrder.setStatus(RefundStatus.SUCCESS.name());
             refundOrder.setRefundTime(LocalDateTime.now());
             refundOrderMapper.updateById(refundOrder);
             paymentOrder.setStatus(PaymentStatus.PART_REFUNDED.name());
@@ -339,8 +352,8 @@ public class PaymentServiceImpl implements PaymentService {
                 new LambdaQueryWrapper<SupportOrder>()
                         .eq(SupportOrder::getSupportNo, paymentOrder.getSupportNo())
                         .last("LIMIT 1"));
-        if (supportOrder != null && "CREATED".equals(supportOrder.getStatus())) {
-            supportOrder.setStatus("CLOSED");
+        if (supportOrder != null && SupportStatus.CREATED.name().equals(supportOrder.getStatus())) {
+            supportOrder.setStatus(SupportStatus.CLOSED.name());
             supportOrderMapper.updateById(supportOrder);
         }
     }
@@ -357,7 +370,7 @@ public class PaymentServiceImpl implements PaymentService {
                         .eq(SupportOrder::getSupportNo, paymentOrder.getSupportNo())
                         .last("LIMIT 1"));
         if (supportOrder != null) {
-            supportOrder.setStatus("PAID");
+            supportOrder.setStatus(SupportStatus.PAID.name());
             supportOrder.setEffectiveAmount(paymentOrder.getEffectiveAmount());
             supportOrder.setPayTime(paymentOrder.getPayTime());
             supportOrderMapper.updateById(supportOrder);
@@ -451,7 +464,7 @@ public class PaymentServiceImpl implements PaymentService {
             refundOrderMapper.updateById(refundOrder);
         } catch (Exception e) {
             log.error("微信退款失败", e);
-            refundOrder.setStatus("FAIL");
+            refundOrder.setStatus(RefundStatus.FAIL.name());
             refundOrderMapper.updateById(refundOrder);
             paymentOrder.setStatus(PaymentStatus.REFUNDING.name());
             paymentOrderMapper.updateById(paymentOrder);
@@ -466,25 +479,16 @@ public class PaymentServiceImpl implements PaymentService {
 
     /**
      * 清理筹款相关缓存(支付后调用)
+     * 使用deleteByPattern替代SCAN+循环DELETE
      */
     private void clearCampaignCache(Long campaignId) {
         try {
             // 清理详情缓存
             redisService.delete("qgc:cache:campaign:detail:" + campaignId);
-            // 清理列表缓存
-            java.util.Set<String> listKeys = redisService.getKeysByPattern("qgc:cache:campaign:list:*");
-            if (listKeys != null) {
-                for (String key : listKeys) {
-                    redisService.delete(key);
-                }
-            }
-            // 清理热门缓存
-            java.util.Set<String> hotKeys = redisService.getKeysByPattern("qgc:cache:campaign:hot*");
-            if (hotKeys != null) {
-                for (String key : hotKeys) {
-                    redisService.delete(key);
-                }
-            }
+            // 清理列表缓存(版本化递增, 无需SCAN)
+            redisService.increment("qgc:cache:campaign:list:version");
+            // 清理热门缓存(版本化递增, 无需SCAN)
+            redisService.increment("qgc:cache:campaign:hot:version");
         } catch (Exception e) {
             log.warn("清理筹款缓存失败, campaignId={}", campaignId, e);
         }

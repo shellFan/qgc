@@ -75,19 +75,11 @@ public class RateLimitInterceptor implements HandlerInterceptor {
         String identity = getUserIdentity(request);
         String limitKey = "qgc:ratelimit:" + action + ":" + identity;
 
-        // Redis计数限流
-        String countStr = redisService.get(limitKey);
-        int count = countStr != null ? Integer.parseInt(countStr) : 0;
-        if (count >= rule.maxCount) {
+        // Redis计数限流(使用RedisService.rateLimit原子操作)
+        boolean allowed = redisService.rateLimit(limitKey, rule.maxCount, rule.timeWindowSeconds);
+        if (!allowed) {
             writeTooManyRequests(response);
             return false;
-        }
-
-        // 增加计数
-        if (count == 0) {
-            redisService.set(limitKey, "1", rule.timeWindowSeconds, TimeUnit.SECONDS);
-        } else {
-            redisService.increment(limitKey);
         }
 
         return true;

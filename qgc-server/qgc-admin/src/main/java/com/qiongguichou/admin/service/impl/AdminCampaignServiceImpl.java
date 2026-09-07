@@ -41,8 +41,8 @@ public class AdminCampaignServiceImpl implements AdminCampaignService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void approve(Long campaignId, Admin admin) {
-        Campaign campaign = getCampaignAndCheck(campaignId, "PENDING_REVIEW");
-        campaign.setStatus("ACTIVE");
+        Campaign campaign = getCampaignAndCheck(campaignId, CampaignStatus.PENDING_REVIEW);
+        campaign.setStatus(CampaignStatus.ACTIVE.name());
         campaign.setUpdateBy(admin.getId());
         campaignMapper.updateById(campaign);
         log.info("筹款审核通过: campaignId={}, adminId={}", campaignId, admin.getId());
@@ -51,8 +51,8 @@ public class AdminCampaignServiceImpl implements AdminCampaignService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void reject(Long campaignId, String reason, Admin admin) {
-        Campaign campaign = getCampaignAndCheck(campaignId, "PENDING_REVIEW");
-        campaign.setStatus("REJECTED");
+        Campaign campaign = getCampaignAndCheck(campaignId, CampaignStatus.PENDING_REVIEW);
+        campaign.setStatus(CampaignStatus.REJECTED.name());
         campaign.setRejectReason(reason);
         campaign.setUpdateBy(admin.getId());
         campaignMapper.updateById(campaign);
@@ -66,10 +66,10 @@ public class AdminCampaignServiceImpl implements AdminCampaignService {
         if (campaign == null) {
             throw new BusinessException(ErrorCode.CAMPAIGN_NOT_FOUND);
         }
-        if (!"ACTIVE".equals(campaign.getStatus())) {
+        if (!CampaignStatus.ACTIVE.name().equals(campaign.getStatus())) {
             throw new BusinessException(ErrorCode.CAMPAIGN_NOT_ACTIVE, "只有进行中的筹款可以冻结");
         }
-        campaign.setStatus("RISK_FROZEN");
+        campaign.setStatus(CampaignStatus.RISK_FROZEN.name());
         campaign.setCloseReason(reason);
         campaign.setUpdateBy(admin.getId());
         campaignMapper.updateById(campaign);
@@ -83,10 +83,10 @@ public class AdminCampaignServiceImpl implements AdminCampaignService {
         if (campaign == null) {
             throw new BusinessException(ErrorCode.CAMPAIGN_NOT_FOUND);
         }
-        if (!"RISK_FROZEN".equals(campaign.getStatus())) {
+        if (!CampaignStatus.RISK_FROZEN.name().equals(campaign.getStatus())) {
             throw new BusinessException(ErrorCode.PARAM_ERROR, "只有风控冻结的筹款可以解冻");
         }
-        campaign.setStatus("ACTIVE");
+        campaign.setStatus(CampaignStatus.ACTIVE.name());
         campaign.setCloseReason(null);
         campaign.setUpdateBy(admin.getId());
         campaignMapper.updateById(campaign);
@@ -100,10 +100,10 @@ public class AdminCampaignServiceImpl implements AdminCampaignService {
         if (campaign == null) {
             throw new BusinessException(ErrorCode.CAMPAIGN_NOT_FOUND);
         }
-        if ("CLOSED".equals(campaign.getStatus()) || "SUCCESS".equals(campaign.getStatus())) {
+        if (CampaignStatus.CLOSED.name().equals(campaign.getStatus()) || CampaignStatus.SUCCESS.name().equals(campaign.getStatus())) {
             throw new BusinessException(ErrorCode.PARAM_ERROR, "该筹款状态不允许关闭");
         }
-        campaign.setStatus("CLOSED");
+        campaign.setStatus(CampaignStatus.CLOSED.name());
         campaign.setCloseReason(reason);
         campaign.setUpdateBy(admin.getId());
         campaignMapper.updateById(campaign);
@@ -119,12 +119,12 @@ public class AdminCampaignServiceImpl implements AdminCampaignService {
         return campaign;
     }
 
-    private Campaign getCampaignAndCheck(Long campaignId, String expectedStatus) {
+    private Campaign getCampaignAndCheck(Long campaignId, CampaignStatus expectedStatus) {
         Campaign campaign = campaignMapper.selectById(campaignId);
         if (campaign == null) {
             throw new BusinessException(ErrorCode.CAMPAIGN_NOT_FOUND);
         }
-        if (!expectedStatus.equals(campaign.getStatus())) {
+        if (!expectedStatus.name().equals(campaign.getStatus())) {
             throw new BusinessException(ErrorCode.PARAM_ERROR, "筹款状态不正确");
         }
         return campaign;

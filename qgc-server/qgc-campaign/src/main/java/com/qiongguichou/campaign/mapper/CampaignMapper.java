@@ -48,4 +48,13 @@ public interface CampaignMapper extends BaseMapper<Campaign> {
      * @return 影响行数
      */
     int updateRaisedAmount(@Param("id") Long id, @Param("addAmount") Long addAmount);
+
+    /**
+     * 原子增量更新浏览量(避免read-modify-write竞态)
+     *
+     * @param id        项目ID
+     * @param addCount  增加浏览量
+     * @return 影响行数
+     */
+    int incrementViewCount(@Param("id") Long id, @Param("addCount") int addCount);
 }

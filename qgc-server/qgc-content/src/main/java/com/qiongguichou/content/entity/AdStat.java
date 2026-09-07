@@ -17,9 +17,9 @@ public class AdStat {
 
     private LocalDate statDate;
 
-    private Integer impressionCount;
+    private Long impressionCount;
 
-    private Integer clickCount;
+    private Long clickCount;
 
     @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createTime;

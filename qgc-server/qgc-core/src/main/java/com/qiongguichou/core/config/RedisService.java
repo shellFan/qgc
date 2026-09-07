@@ -1,10 +1,13 @@
 package com.qiongguichou.core.config;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.Cursor;
+import org.springframework.data.redis.core.ScanOptions;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -27,6 +30,22 @@ public class RedisService {
 
     public void set(String key, String value, long timeout, TimeUnit unit) {
         redisTemplate.opsForValue().set(key, value, timeout, unit);
+    }
+
+    /**
+     * SET NX + EX 原子操作(仅当key不存在时设置)
+     * @return true=设置成功, false=key已存在
+     */
+    public boolean setIfAbsent(String key, String value, long timeout, TimeUnit unit) {
+        Boolean result = redisTemplate.opsForValue().setIfAbsent(key, value, timeout, unit);
+        return Boolean.TRUE.equals(result);
+    }
+
+    /**
+     * GETSET原子操作: 设置新值并返回旧值
+     */
+    public String getAndSet(String key, String newValue) {
+        return redisTemplate.opsForValue().getAndSet(key, newValue);
     }
 
     public String get(String key) {
@@ -111,9 +130,30 @@ public class RedisService {
     }
 
     /**
-     * 按模式获取keys
+     * 按模式获取keys(使用SCAN替代KEYS，生产安全)
+     * SCAN不会阻塞Redis，适合生产环境
      */
     public Set<String> getKeysByPattern(String pattern) {
-        return redisTemplate.keys(pattern);
+        Set<String> keys = new HashSet<>();
+        try (Cursor<String> cursor = redisTemplate.scan(ScanOptions.scanOptions().match(pattern).count(100).build())) {
+            while (cursor.hasNext()) {
+                keys.add(cursor.next());
+            }
+        } catch (Exception e) {
+            log.error("SCAN扫描key失败, pattern={}", pattern, e);
+        }
+        return keys;
+    }
+
+    /**
+     * 按模式删除keys(SCAN+DELETE，生产安全)
+     */
+    public long deleteByPattern(String pattern) {
+        Set<String> keys = getKeysByPattern(pattern);
+        if (keys != null && !keys.isEmpty()) {
+            Long count = redisTemplate.delete(keys);
+            return count != null ? count : 0;
+        }
+        return 0;
     }
 }

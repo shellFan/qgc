@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.qiongguichou.admin.entity.Admin;
 import com.qiongguichou.admin.service.AdminWithdrawService;
+import com.qiongguichou.common.enums.WithdrawStatus;
 import com.qiongguichou.common.exception.BusinessException;
 import com.qiongguichou.common.result.ErrorCode;
 import com.qiongguichou.common.util.OrderNoUtil;
@@ -48,11 +49,11 @@ public class AdminWithdrawServiceImpl implements AdminWithdrawService {
     @Transactional(rollbackFor = Exception.class)
     public void approveWithdraw(Long withdrawOrderId, Admin admin) {
         WithdrawOrder order = getWithdrawOrder(withdrawOrderId);
-        if (!"PENDING".equals(order.getStatus())) {
+        if (!WithdrawStatus.PENDING.name().equals(order.getStatus())) {
             throw new BusinessException(ErrorCode.PARAM_ERROR, "只有待审核的提现可以审核通过");
         }
         // 审核通过 → 进入处理中状态
-        order.setStatus("PROCESSING");
+        order.setStatus(WithdrawStatus.PROCESSING.name());
         order.setReviewerId(admin.getId());
         order.setReviewTime(LocalDateTime.now());
         withdrawOrderMapper.updateById(order);
@@ -63,13 +64,13 @@ public class AdminWithdrawServiceImpl implements AdminWithdrawService {
     @Transactional(rollbackFor = Exception.class)
     public void rejectWithdraw(Long withdrawOrderId, String reason, Admin admin) {
         WithdrawOrder order = getWithdrawOrder(withdrawOrderId);
-        if (!"PENDING".equals(order.getStatus())) {
+        if (!WithdrawStatus.PENDING.name().equals(order.getStatus())) {
             throw new BusinessException(ErrorCode.PARAM_ERROR, "只有待审核的提现可以拒绝");
         }
         // 退回余额
         returnBalance(order, reason);
 
-        order.setStatus("REJECTED");
+        order.setStatus(WithdrawStatus.REJECTED.name());
         order.setReviewerId(admin.getId());
         order.setReviewTime(LocalDateTime.now());
         order.setRejectReason(reason);
@@ -81,10 +82,10 @@ public class AdminWithdrawServiceImpl implements AdminWithdrawService {
     @Transactional(rollbackFor = Exception.class)
     public void markPaid(Long withdrawOrderId, String transferNo, Admin admin) {
         WithdrawOrder order = getWithdrawOrder(withdrawOrderId);
-        if (!"PROCESSING".equals(order.getStatus())) {
+        if (!WithdrawStatus.PROCESSING.name().equals(order.getStatus())) {
             throw new BusinessException(ErrorCode.PARAM_ERROR, "只有处理中的提现可以标记打款");
         }
-        order.setStatus("SUCCESS");
+        order.setStatus(WithdrawStatus.SUCCESS.name());
         order.setTransferNo(transferNo);
         order.setTransferTime(LocalDateTime.now());
         withdrawOrderMapper.updateById(order);
@@ -95,13 +96,13 @@ public class AdminWithdrawServiceImpl implements AdminWithdrawService {
     @Transactional(rollbackFor = Exception.class)
     public void markPayFail(Long withdrawOrderId, String reason, Admin admin) {
         WithdrawOrder order = getWithdrawOrder(withdrawOrderId);
-        if (!"PROCESSING".equals(order.getStatus())) {
+        if (!WithdrawStatus.PROCESSING.name().equals(order.getStatus())) {
             throw new BusinessException(ErrorCode.PARAM_ERROR, "只有处理中的提现可以标记打款失败");
         }
         // 退回余额
         returnBalance(order, reason);
 
-        order.setStatus("FAIL");
+        order.setStatus(WithdrawStatus.FAIL.name());
         order.setRejectReason(reason);
         withdrawOrderMapper.updateById(order);
         log.info("提现打款失败: orderId={}, reason={}", withdrawOrderId, reason);

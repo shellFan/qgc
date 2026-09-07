@@ -59,7 +59,7 @@
                 ORDER BY (c.raised_amount * 1.0 / c.target_amount) DESC, c.create_time DESC
             </when>
             <when test="sort == 'RANDOM'">
-                ORDER BY RAND()
+                ORDER BY c.id DESC
             </when>
             <when test="sort == 'POPULAR'">
                 ORDER BY c.support_count DESC, c.raised_amount DESC
@@ -105,6 +105,15 @@
               #{addAmount} &lt; 0
               OR (raised_amount + #{addAmount}) &lt;= target_amount
           )
+    </update>
+
+    <!-- 原子增量更新浏览量(避免read-modify-write竞态) -->
+    <update id="incrementViewCount">
+        UPDATE qgc_campaign
+        SET view_count = view_count + #{addCount},
+            update_time = NOW()
+        WHERE id = #{id}
+          AND deleted = 0
     </update>
 
 </mapper>

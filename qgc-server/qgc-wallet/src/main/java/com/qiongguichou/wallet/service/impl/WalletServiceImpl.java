@@ -2,6 +2,8 @@ package com.qiongguichou.wallet.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.qiongguichou.common.enums.WalletFlowType;
+import com.qiongguichou.common.enums.WithdrawStatus;
+import com.qiongguichou.core.config.RedisService;
 import com.qiongguichou.common.exception.BusinessException;
 import com.qiongguichou.common.result.ErrorCode;
 import com.qiongguichou.common.util.MoneyUtil;
@@ -40,9 +42,12 @@ public class WalletServiceImpl implements WalletService {
     private final WalletFlowMapper walletFlowMapper;
     private final WithdrawOrderMapper withdrawOrderMapper;
     private final RedissonClient redissonClient;
+    private final RedisService redisService;
 
-    /** 提现手续费率(0.6%) */
-    private static final int WITHDRAW_FEE_RATE = 6;
+    /** 提现手续费率默认值(0.6%), 从system_config读取withdraw.fee_rate覆盖 */
+    private static final int DEFAULT_FEE_RATE_PERMILLE = 6;
+    /** 最低手续费默认值(1元=100分), 从system_config读取withdraw.min_fee覆盖 */
+    private static final long DEFAULT_MIN_FEE = 100L;
 
     @Override
     public WalletVO getWallet(Long userId) {
@@ -129,8 +134,27 @@ public class WalletServiceImpl implements WalletService {
                 throw new BusinessException(ErrorCode.WALLET_INSUFFICIENT);
             }
 
-            // 计算手续费
-            Long fee = Math.max(1L, request.getAmount() * WITHDRAW_FEE_RATE / 1000);
+            // 计算手续费(从system_config读取配置, 支持动态调整)
+            int feeRatePermille = DEFAULT_FEE_RATE_PERMILLE;
+            try {
+                String feeRateConfig = redisService.get("qgc:config:withdraw:fee_rate");
+                if (feeRateConfig != null && !feeRateConfig.isEmpty()) {
+                    // 配置值为费率, 如0.006表示0.6%, 转换为千分比
+                    feeRatePermille = (int) (Double.parseDouble(feeRateConfig) * 1000);
+                }
+            } catch (NumberFormatException e) {
+                log.warn("提现手续费率配置格式错误, 使用默认值", e);
+            }
+            long minFee = DEFAULT_MIN_FEE;
+            try {
+                String minFeeConfig = redisService.get("qgc:config:withdraw:min_fee");
+                if (minFeeConfig != null && !minFeeConfig.isEmpty()) {
+                    minFee = Long.parseLong(minFeeConfig);
+                }
+            } catch (NumberFormatException e) {
+                log.warn("最低手续费配置格式错误, 使用默认值", e);
+            }
+            Long fee = Math.max(minFee, request.getAmount() * feeRatePermille / 1000);
             Long actualAmount = request.getAmount() - fee;
 
             // 扣减余额(乐观锁)
@@ -146,7 +170,7 @@ public class WalletServiceImpl implements WalletService {
             order.setAmount(request.getAmount());
             order.setActualAmount(actualAmount);
             order.setFee(fee);
-            order.setStatus("PENDING");
+            order.setStatus(WithdrawStatus.PENDING.name());
             withdrawOrderMapper.insert(order);
 
             // 重新查询最新余额用于流水记录

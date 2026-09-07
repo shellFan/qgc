@@ -62,6 +62,8 @@ public class CampaignServiceImpl implements CampaignService {
     private static final String CACHE_CAMPAIGN_DETAIL = "qgc:cache:campaign:detail:";
     private static final String CACHE_CAMPAIGN_LIST = "qgc:cache:campaign:list:";
     private static final String CACHE_HOT_LIST = "qgc:cache:campaign:hot";
+    private static final String CACHE_LIST_VERSION_KEY = "qgc:cache:campaign:list:version";
+    private static final String CACHE_HOT_VERSION_KEY = "qgc:cache:campaign:hot:version";
     private static final long CACHE_DETAIL_TTL_MINUTES = 10;
     private static final long CACHE_LIST_TTL_MINUTES = 5;
     private static final long CACHE_HOT_TTL_MINUTES = 3;
@@ -255,10 +257,16 @@ public class CampaignServiceImpl implements CampaignService {
 
     @Override
     public IPage<CampaignListVO> getList(int pageNum, int pageSize, String sort, Long categoryId, String keyword) {
-        // 首页列表(无keyword)才走缓存
+        // 首页列表(无keyword)才走缓存, 使用版本化key避免SCAN扫描
+        String listVersion = null;
         if (keyword == null || keyword.isEmpty()) {
             try {
-                String cacheKey = CACHE_CAMPAIGN_LIST + pageNum + ":" + pageSize + ":" + sort + ":" + (categoryId != null ? categoryId : 0);
+                listVersion = redisService.get(CACHE_LIST_VERSION_KEY);
+                if (listVersion == null) {
+                    listVersion = "1";
+                    redisService.set(CACHE_LIST_VERSION_KEY, listVersion, 24, TimeUnit.HOURS);
+                }
+                String cacheKey = CACHE_CAMPAIGN_LIST + listVersion + ":" + pageNum + ":" + pageSize + ":" + sort + ":" + (categoryId != null ? categoryId : 0);
                 String cached = redisService.get(cacheKey);
                 if (cached != null) {
                     com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
@@ -278,10 +286,22 @@ public class CampaignServiceImpl implements CampaignService {
             fillCalculatedFields(vo);
         }
 
+        // RANDOM排序: SQL使用ORDER BY id(快速), Java层shuffle实现随机效果, 避免ORDER BY RAND()全表扫描
+        if ("RANDOM".equals(sort) && result.getRecords() != null && result.getRecords().size() > 1) {
+            java.util.Collections.shuffle(result.getRecords());
+        }
+
         // 首页列表(无keyword)写入缓存
         if (keyword == null || keyword.isEmpty()) {
             try {
-                String cacheKey = CACHE_CAMPAIGN_LIST + pageNum + ":" + pageSize + ":" + sort + ":" + (categoryId != null ? categoryId : 0);
+                if (listVersion == null) {
+                    listVersion = redisService.get(CACHE_LIST_VERSION_KEY);
+                    if (listVersion == null) {
+                        listVersion = "1";
+                        redisService.set(CACHE_LIST_VERSION_KEY, listVersion, 24, TimeUnit.HOURS);
+                    }
+                }
+                String cacheKey = CACHE_CAMPAIGN_LIST + listVersion + ":" + pageNum + ":" + pageSize + ":" + sort + ":" + (categoryId != null ? categoryId : 0);
                 com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
                 mapper.registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
                 String json = mapper.writeValueAsString(result);
@@ -296,9 +316,14 @@ public class CampaignServiceImpl implements CampaignService {
 
     @Override
     public List<CampaignListVO> getHotList(int limit) {
-        // 尝试从缓存读取
+        // 使用版本化key避免SCAN扫描
         try {
-            String cacheKey = CACHE_HOT_LIST + ":" + limit;
+            String hotVersion = redisService.get(CACHE_HOT_VERSION_KEY);
+            if (hotVersion == null) {
+                hotVersion = "1";
+                redisService.set(CACHE_HOT_VERSION_KEY, hotVersion, 24, TimeUnit.HOURS);
+            }
+            String cacheKey = CACHE_HOT_LIST + ":" + hotVersion + ":" + limit;
             String cached = redisService.get(cacheKey);
             if (cached != null) {
                 com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
@@ -316,7 +341,12 @@ public class CampaignServiceImpl implements CampaignService {
 
         // 写入缓存
         try {
-            String cacheKey = CACHE_HOT_LIST + ":" + limit;
+            String hotVersion = redisService.get(CACHE_HOT_VERSION_KEY);
+            if (hotVersion == null) {
+                hotVersion = "1";
+                redisService.set(CACHE_HOT_VERSION_KEY, hotVersion, 24, TimeUnit.HOURS);
+            }
+            String cacheKey = CACHE_HOT_LIST + ":" + hotVersion + ":" + limit;
             com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
             mapper.registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
             String json = mapper.writeValueAsString(list);
@@ -366,8 +396,7 @@ public class CampaignServiceImpl implements CampaignService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void syncViewCounts() {
-        // 查询所有有浏览量缓存的key
-        // 使用keys命令扫描(生产环境建议使用scan)
+        // 使用SCAN扫描浏览量缓存key
         Set<String> keys = redisService.getKeysByPattern("qgc:campaign:views:*");
         if (keys == null || keys.isEmpty()) {
             return;
@@ -380,14 +409,10 @@ public class CampaignServiceImpl implements CampaignService {
                 Long campaignId = Long.parseLong(idStr);
                 Integer viewCount = redisService.getViewCount(campaignId);
                 if (viewCount != null && viewCount > 0) {
-                    // 更新MySQL
-                    Campaign campaign = campaignMapper.selectById(campaignId);
-                    if (campaign != null) {
-                        campaign.setViewCount(campaign.getViewCount() + viewCount);
-                        campaignMapper.updateById(campaign);
-                        // 清除Redis缓存
-                        redisService.clearViewCount(campaignId);
-                    }
+                    // 原子更新MySQL(使用SQL增量更新而非read-modify-write)
+                    campaignMapper.incrementViewCount(campaignId, viewCount);
+                    // 清除Redis缓存
+                    redisService.clearViewCount(campaignId);
                 }
             } catch (Exception e) {
                 log.error("同步浏览量失败, key={}", key, e);
@@ -492,32 +517,24 @@ public class CampaignServiceImpl implements CampaignService {
     }
 
     /**
-     * 清理列表缓存(按模式删除)
+     * 清理列表缓存(版本化: 递增版本号, 旧key自然过期)
      */
     public void clearListCache() {
         try {
-            Set<String> keys = redisService.getKeysByPattern(CACHE_CAMPAIGN_LIST + "*");
-            if (keys != null && !keys.isEmpty()) {
-                for (String key : keys) {
-                    redisService.delete(key);
-                }
-            }
+            // 递增版本号, 旧版本key自然过期, 无需SCAN扫描
+            redisService.increment(CACHE_LIST_VERSION_KEY);
         } catch (Exception e) {
             log.warn("清理筹款列表缓存失败", e);
         }
     }
 
     /**
-     * 清理热门缓存
+     * 清理热门缓存(版本化: 递增版本号, 旧key自然过期)
      */
     public void clearHotCache() {
         try {
-            Set<String> keys = redisService.getKeysByPattern(CACHE_HOT_LIST + "*");
-            if (keys != null && !keys.isEmpty()) {
-                for (String key : keys) {
-                    redisService.delete(key);
-                }
-            }
+            // 递增版本号, 旧版本key自然过期, 无需SCAN扫描
+            redisService.increment(CACHE_HOT_VERSION_KEY);
         } catch (Exception e) {
             log.warn("清理热门筹款缓存失败", e);
         }

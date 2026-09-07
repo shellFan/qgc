@@ -79,30 +79,41 @@ public class AdService {
     /**
      * 获取广告当日Redis中的曝光数
      */
-    public int getViewCount(Long adId) {
+    public long getViewCount(Long adId) {
         String key = AD_VIEW_KEY + adId + ":" + LocalDate.now().format(DATE_FMT);
         String value = redisService.get(key);
-        return value != null ? Integer.parseInt(value) : 0;
+        return value != null ? Long.parseLong(value) : 0L;
     }
 
     /**
      * 获取广告当日Redis中的点击数
      */
-    public int getClickCount(Long adId) {
+    public long getClickCount(Long adId) {
         String key = AD_CLICK_KEY + adId + ":" + LocalDate.now().format(DATE_FMT);
         String value = redisService.get(key);
-        return value != null ? Integer.parseInt(value) : 0;
+        return value != null ? Long.parseLong(value) : 0L;
     }
 
     /**
      * 同步Redis广告统计到数据库(定时任务调用)
      * 原子操作: 使用GETSET读取并清零Redis计数，再upsert到DB
+     * 跨天安全: 扫描yesterday+today防止跨日边界数据丢失
      */
     public void syncAdStats() {
         LocalDate today = LocalDate.now();
-        String dateStr = today.format(DATE_FMT);
+        LocalDate yesterday = today.minusDays(1);
 
-        // 扫描当日曝光key
+        // 扫描昨天和今天的key, 防止跨日边界数据丢失
+        for (LocalDate date : new LocalDate[]{yesterday, today}) {
+            String dateStr = date.format(DATE_FMT);
+            syncAdStatsForDate(date, dateStr);
+        }
+    }
+
+    /**
+     * 同步指定日期的广告统计
+     */
+    private void syncAdStatsForDate(LocalDate date, String dateStr) {
         Set<String> viewKeys = redisService.getKeysByPattern(AD_VIEW_KEY + "*:" + dateStr);
         for (String viewKey : viewKeys) {
             try {
@@ -112,33 +123,35 @@ public class AdService {
                 if (lastColon <= 0) continue;
                 Long adId = Long.parseLong(keyBody.substring(0, lastColon));
 
-                // 读取并清零曝光计数(原子操作: GET + DEL)
-                int viewCount = getViewCount(adId);
-                if (viewCount > 0) {
-                    redisService.delete(viewKey);
-                }
+                // 原子drain曝光计数: GETSET读取并清零, 防止GET和DELETE之间新曝光丢失
+                String viewVal = redisService.getAndSet(viewKey, "0");
+                long viewCount = (viewVal != null && !viewVal.isEmpty()) ? Long.parseLong(viewVal) : 0L;
 
-                // 读取点击计数(同日)
-                int clickCount = getClickCount(adId);
+                // 原子drain点击计数
                 String clickKey = AD_CLICK_KEY + adId + ":" + dateStr;
-                if (clickCount > 0) {
-                    redisService.delete(clickKey);
-                }
+                String clickVal = redisService.getAndSet(clickKey, "0");
+                long clickCount = (clickVal != null && !clickVal.isEmpty()) ? Long.parseLong(clickVal) : 0L;
 
                 // 原子upsert到DB
                 if (viewCount > 0 || clickCount > 0) {
                     AdStat stat = new AdStat();
                     stat.setAdId(adId);
-                    stat.setStatDate(today);
+                    stat.setStatDate(date);
                     stat.setImpressionCount(viewCount);
                     stat.setClickCount(clickCount);
                     adStatMapper.upsertByAdAndDate(stat);
+                }
+
+                // 清零后删除key(非当日的key, 保留当日key继续计数)
+                if (!date.equals(LocalDate.now())) {
+                    redisService.delete(viewKey);
+                    redisService.delete(clickKey);
                 }
             } catch (Exception e) {
                 log.error("同步广告统计失败, key={}", viewKey, e);
             }
         }
-        log.info("广告统计同步完成, 共处理{}个key", viewKeys.size());
+        log.info("广告统计同步完成, date={}, 共处理{}个key", dateStr, viewKeys.size());
     }
 
     /**
