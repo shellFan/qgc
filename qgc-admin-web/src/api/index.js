@@ -52,3 +52,8 @@ export const getRiskConfig = () => request.get('/admin/api/risk/config')
 export const updateRiskConfig = (data) => request.post('/admin/api/risk/config', data)
 export const getRiskRecords = (params) => request.get('/admin/api/risk/records', { params })
 export const handleRiskRecord = (id) => request.post(`/admin/api/risk/record/${id}`)
+
+// ====== 对账 ======
+export const reconcileWallet = () => request.get('/admin/api/reconcile/wallet')
+export const reconcileCampaign = () => request.get('/admin/api/reconcile/campaign')
+export const reconcilePayment = () => request.get('/admin/api/reconcile/payment')

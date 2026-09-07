@@ -85,7 +85,8 @@ async function handlePay() {
       amount: yuanToFen(amountYuan.value),
       message: message.value,
       anonymous: anonymous.value ? 1 : 0,
-      hideAmount: hideAmount.value ? 1 : 0
+      hideAmount: hideAmount.value ? 1 : 0,
+      requestId: `pay_${campaign.value.id}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
     }
     const res = await createPayment(data)
     // Mock模式直接返回成功
