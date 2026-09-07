@@ -1,6 +1,7 @@
 package com.qiongguichou.admin.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.qiongguichou.admin.entity.Admin;
@@ -48,63 +49,78 @@ public class AdminWithdrawServiceImpl implements AdminWithdrawService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void approveWithdraw(Long withdrawOrderId, Admin admin) {
-        WithdrawOrder order = getWithdrawOrder(withdrawOrderId);
-        if (!WithdrawStatus.PENDING.name().equals(order.getStatus())) {
-            throw new BusinessException(ErrorCode.PARAM_ERROR, "只有待审核的提现可以审核通过");
+        // CAS条件更新: 只有PENDING状态才能审核通过，防止双击重复审核
+        LambdaUpdateWrapper<WithdrawOrder> wrapper = new LambdaUpdateWrapper<>();
+        wrapper.eq(WithdrawOrder::getId, withdrawOrderId)
+               .eq(WithdrawOrder::getStatus, WithdrawStatus.PENDING.name())
+               .set(WithdrawOrder::getStatus, WithdrawStatus.PROCESSING.name())
+               .set(WithdrawOrder::getReviewerId, admin.getId())
+               .set(WithdrawOrder::getReviewTime, LocalDateTime.now());
+        int rows = withdrawOrderMapper.update(null, wrapper);
+        if (rows == 0) {
+            throw new BusinessException(ErrorCode.PARAM_ERROR, "提现订单状态已变更，请刷新重试");
         }
-        // 审核通过 → 进入处理中状态
-        order.setStatus(WithdrawStatus.PROCESSING.name());
-        order.setReviewerId(admin.getId());
-        order.setReviewTime(LocalDateTime.now());
-        withdrawOrderMapper.updateById(order);
         log.info("提现审核通过: orderId={}, adminId={}", withdrawOrderId, admin.getId());
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void rejectWithdraw(Long withdrawOrderId, String reason, Admin admin) {
-        WithdrawOrder order = getWithdrawOrder(withdrawOrderId);
-        if (!WithdrawStatus.PENDING.name().equals(order.getStatus())) {
-            throw new BusinessException(ErrorCode.PARAM_ERROR, "只有待审核的提现可以拒绝");
+        // CAS条件更新: 只有PENDING状态才能拒绝，防止双击
+        LambdaUpdateWrapper<WithdrawOrder> wrapper = new LambdaUpdateWrapper<>();
+        wrapper.eq(WithdrawOrder::getId, withdrawOrderId)
+               .eq(WithdrawOrder::getStatus, WithdrawStatus.PENDING.name())
+               .set(WithdrawOrder::getStatus, WithdrawStatus.REJECTED.name())
+               .set(WithdrawOrder::getReviewerId, admin.getId())
+               .set(WithdrawOrder::getReviewTime, LocalDateTime.now())
+               .set(WithdrawOrder::getRejectReason, reason);
+        int rows = withdrawOrderMapper.update(null, wrapper);
+        if (rows == 0) {
+            throw new BusinessException(ErrorCode.PARAM_ERROR, "提现订单状态已变更，请刷新重试");
         }
-        // 退回余额
+
+        // 退回余额(需要先查询订单信息)
+        WithdrawOrder order = withdrawOrderMapper.selectById(withdrawOrderId);
         returnBalance(order, reason);
 
-        order.setStatus(WithdrawStatus.REJECTED.name());
-        order.setReviewerId(admin.getId());
-        order.setReviewTime(LocalDateTime.now());
-        order.setRejectReason(reason);
-        withdrawOrderMapper.updateById(order);
         log.info("提现审核拒绝: orderId={}, adminId={}, reason={}", withdrawOrderId, admin.getId(), reason);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void markPaid(Long withdrawOrderId, String transferNo, Admin admin) {
-        WithdrawOrder order = getWithdrawOrder(withdrawOrderId);
-        if (!WithdrawStatus.PROCESSING.name().equals(order.getStatus())) {
-            throw new BusinessException(ErrorCode.PARAM_ERROR, "只有处理中的提现可以标记打款");
+        // CAS条件更新: 只有PROCESSING状态才能标记打款成功
+        LambdaUpdateWrapper<WithdrawOrder> wrapper = new LambdaUpdateWrapper<>();
+        wrapper.eq(WithdrawOrder::getId, withdrawOrderId)
+               .eq(WithdrawOrder::getStatus, WithdrawStatus.PROCESSING.name())
+               .set(WithdrawOrder::getStatus, WithdrawStatus.SUCCESS.name())
+               .set(WithdrawOrder::getTransferNo, transferNo)
+               .set(WithdrawOrder::getTransferTime, LocalDateTime.now());
+        int rows = withdrawOrderMapper.update(null, wrapper);
+        if (rows == 0) {
+            throw new BusinessException(ErrorCode.PARAM_ERROR, "提现订单状态已变更，请刷新重试");
         }
-        order.setStatus(WithdrawStatus.SUCCESS.name());
-        order.setTransferNo(transferNo);
-        order.setTransferTime(LocalDateTime.now());
-        withdrawOrderMapper.updateById(order);
         log.info("提现打款成功: orderId={}, transferNo={}", withdrawOrderId, transferNo);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void markPayFail(Long withdrawOrderId, String reason, Admin admin) {
-        WithdrawOrder order = getWithdrawOrder(withdrawOrderId);
-        if (!WithdrawStatus.PROCESSING.name().equals(order.getStatus())) {
-            throw new BusinessException(ErrorCode.PARAM_ERROR, "只有处理中的提现可以标记打款失败");
+        // CAS条件更新: 只有PROCESSING状态才能标记打款失败
+        LambdaUpdateWrapper<WithdrawOrder> wrapper = new LambdaUpdateWrapper<>();
+        wrapper.eq(WithdrawOrder::getId, withdrawOrderId)
+               .eq(WithdrawOrder::getStatus, WithdrawStatus.PROCESSING.name())
+               .set(WithdrawOrder::getStatus, WithdrawStatus.FAIL.name())
+               .set(WithdrawOrder::getRejectReason, reason);
+        int rows = withdrawOrderMapper.update(null, wrapper);
+        if (rows == 0) {
+            throw new BusinessException(ErrorCode.PARAM_ERROR, "提现订单状态已变更，请刷新重试");
         }
-        // 退回余额
+
+        // 退回余额(需要先查询订单信息)
+        WithdrawOrder order = withdrawOrderMapper.selectById(withdrawOrderId);
         returnBalance(order, reason);
 
-        order.setStatus(WithdrawStatus.FAIL.name());
-        order.setRejectReason(reason);
-        withdrawOrderMapper.updateById(order);
         log.info("提现打款失败: orderId={}, reason={}", withdrawOrderId, reason);
     }
 

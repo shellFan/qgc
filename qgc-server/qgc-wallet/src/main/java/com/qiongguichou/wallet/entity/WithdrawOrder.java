@@ -36,6 +36,9 @@ public class WithdrawOrder {
     /** 拒绝原因 */
     private String rejectReason;
 
+    /** 管理员审核备注 */
+    private String adminRemark;
+
     /** 转账流水号 */
     private String transferNo;
 
