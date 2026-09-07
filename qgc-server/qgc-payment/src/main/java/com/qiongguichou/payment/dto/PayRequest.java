@@ -27,4 +27,10 @@ public class PayRequest {
 
     /** 是否匿名 0否1是 */
     private Integer anonymous;
+
+    /** 支付请求ID(客户端生成，幂等防重复支付) */
+    private String requestId;
+
+    /** 分享码(用于归因追踪，可选) */
+    private String shareCode;
 }

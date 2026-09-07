@@ -4,7 +4,9 @@ import com.qiongguichou.common.exception.BusinessException;
 import com.qiongguichou.common.result.ErrorCode;
 import com.qiongguichou.common.util.UserContext;
 import com.qiongguichou.core.config.JwtUtil;
+import com.qiongguichou.core.service.UserStatusChecker;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -15,12 +17,21 @@ import javax.servlet.http.HttpServletResponse;
 
 /**
  * 用户认证拦截器
+ *
+ * RC5增强：封禁用户检查(JWT有效但用户已封禁则拒绝访问)
  */
 @Slf4j
 @Component
 public class UserAuthInterceptor implements HandlerInterceptor {
 
     private final JwtUtil jwtUtil;
+
+    /**
+     * 用户状态检查器(可选注入，qgc-user模块提供实现)
+     * 如果未注入则跳过封禁检查(向后兼容)
+     */
+    @Autowired(required = false)
+    private UserStatusChecker userStatusChecker;
 
     @Value("${qgc.auth.mock-enabled:false}")
     private boolean mockEnabled;
@@ -54,6 +65,13 @@ public class UserAuthInterceptor implements HandlerInterceptor {
 
         Long userId = jwtUtil.getUserId(token);
         UserContext.setUserId(userId);
+
+        // RC5: 封禁用户检查 - JWT有效但用户已封禁则拒绝
+        if (userStatusChecker != null && !userStatusChecker.isUserActive(userId)) {
+            log.warn("封禁用户尝试访问: userId={}, uri={}", userId, uri);
+            UserContext.clear();
+            throw new BusinessException(ErrorCode.FORBIDDEN, "账号已被封禁");
+        }
 
         // 设置IP
         String ip = getClientIp(request);

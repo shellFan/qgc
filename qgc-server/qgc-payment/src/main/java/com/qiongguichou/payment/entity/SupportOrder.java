@@ -48,6 +48,9 @@ public class SupportOrder {
     /** 订单状态: CREATED/PAID/REFUNDED/PART_REFUNDED/CLOSED */
     private String status;
 
+    /** 支付请求ID(客户端生成，幂等防重复) */
+    private String requestId;
+
     /** 支付时间 */
     private LocalDateTime payTime;
 

@@ -97,6 +97,35 @@ public class PaymentServiceImpl implements PaymentService {
             if (campaign.getCreatorUserId().equals(userId)) {
                 throw new BusinessException(ErrorCode.FORBIDDEN, "不能投喂自己的筹款");
             }
+
+            // RC5: requestId幂等检查 - 防止客户端重复提交
+            String requestId = request.getRequestId();
+            if (requestId != null && !requestId.isEmpty()) {
+                SupportOrder existing = supportOrderMapper.selectOne(
+                        new LambdaQueryWrapper<SupportOrder>()
+                                .eq(SupportOrder::getRequestId, requestId)
+                                .last("LIMIT 1"));
+                if (existing != null) {
+                    log.info("支付请求幂等跳过: requestId={}, supportNo={}", requestId, existing.getSupportNo());
+                    PayResult existResult = new PayResult();
+                    existResult.setOrderNo(existing.getSupportNo());
+                    return existResult;
+                }
+            }
+
+            // RC5: shareCode归因验证 - 确保分享码属于当前筹款
+            String shareCode = request.getShareCode();
+            if (shareCode != null && !shareCode.isEmpty()) {
+                Campaign shareCampaign = campaignMapper.selectOne(
+                        new LambdaQueryWrapper<Campaign>()
+                                .eq(Campaign::getShareCode, shareCode)
+                                .last("LIMIT 1"));
+                if (shareCampaign == null || !shareCampaign.getId().equals(campaignId)) {
+                    log.warn("Share归因校验失败: shareCode={}, campaignId={}, 归属campaignId={}",
+                            shareCode, campaignId, shareCampaign != null ? shareCampaign.getId() : null);
+                    // 不阻断支付，仅记录警告
+                }
+            }
             Long remaining = campaign.getTargetAmount() - campaign.getRaisedAmount();
             if (remaining <= 0) {
                 throw new BusinessException(ErrorCode.CAMPAIGN_FULL);
@@ -119,6 +148,7 @@ public class PaymentServiceImpl implements PaymentService {
             supportOrder.setAnonymous(request.getAnonymous() != null ? request.getAnonymous() : 0);
             supportOrder.setHideAmount(0);
             supportOrder.setStatus(SupportStatus.CREATED.name());
+            supportOrder.setRequestId(requestId);
             supportOrderMapper.insert(supportOrder);
 
             // 4. 创建支付订单
