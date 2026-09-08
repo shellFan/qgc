@@ -54,7 +54,7 @@ cors:
 # JWT配置
 qgc:
   jwt:
-    secret: ${JWT_SECRET:qiongguichou2026secretkey_dev_only}
+    secret: ${JWT_SECRET:qiongguichou2026secretkey}
     user-expiration: 604800000  # 7天(毫秒)
     admin-expiration: 86400000  # 1天(毫秒)
 

@@ -45,7 +45,7 @@ export const getAdList = () => request.get('/admin/api/ad/list')
 export const createAd = (data) => request.post('/admin/api/ad', data)
 export const updateAd = (id, data) => request.put(`/admin/api/ad/${id}`, data)
 export const deleteAd = (id) => request.delete(`/admin/api/ad/${id}`)
-export const toggleAd = (id) => request.post(`/admin/api/ad/${id}/toggle`)
+export const toggleAd = (id) => request.put(`/admin/api/ad/${id}/toggle`)
 
 // ====== 风控配置 ======
 export const getRiskConfig = () => request.get('/admin/api/risk/config')

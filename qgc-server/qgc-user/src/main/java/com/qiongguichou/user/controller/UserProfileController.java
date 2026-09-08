@@ -6,6 +6,7 @@ import com.qiongguichou.common.util.UserContext;
 import com.qiongguichou.user.entity.UserBadge;
 import com.qiongguichou.user.entity.UserLevel;
 import com.qiongguichou.user.entity.UserPoints;
+import com.qiongguichou.user.entity.PointsFlow;
 import com.qiongguichou.user.service.UserLevelService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -49,6 +50,15 @@ public class UserProfileController {
     public Result<UserPoints> getMyPoints() {
         Long userId = UserContext.getUserId();
         return Result.success(userLevelService.getUserPoints(userId));
+    }
+
+    /**
+     * 获取我的积分流水
+     */
+    @GetMapping("/points/flow")
+    public Result<List<PointsFlow>> getMyPointsFlow() {
+        Long userId = UserContext.getUserId();
+        return Result.success(userLevelService.getUserPointsFlow(userId));
     }
 
     /**

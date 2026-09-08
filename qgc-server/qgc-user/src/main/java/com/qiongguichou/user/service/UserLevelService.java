@@ -162,6 +162,16 @@ public class UserLevelService {
     }
 
     /**
+     * 获取用户积分流水列表
+     */
+    public List<PointsFlow> getUserPointsFlow(Long userId) {
+        return pointsFlowMapper.selectList(
+                new LambdaQueryWrapper<PointsFlow>()
+                        .eq(PointsFlow::getUserId, userId)
+                        .orderByDesc(PointsFlow::getCreateTime));
+    }
+
+    /**
      * 检查并授予投喂徽章
      */
     public void checkSupportBadges(Long userId, int totalSupportCount) {

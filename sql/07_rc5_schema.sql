@@ -25,13 +25,15 @@ INSERT IGNORE INTO `qgc_schema_version` (`version`, `description`, `applied_at`)
 ALTER TABLE `qgc_withdraw_order`
   ADD COLUMN `admin_remark` VARCHAR(512) DEFAULT NULL COMMENT '管理员审核备注' AFTER `reject_reason`;
 
--- 3. 支持订单支付requestId唯一索引: 幂等防重复支付
+-- 3. 支持订单支付requestId字段+唯一索引: 幂等防重复支付
+ALTER TABLE `qgc_support_order`
+  ADD COLUMN `request_id` VARCHAR(64) DEFAULT NULL COMMENT '支付请求ID(客户端生成，幂等防重复)' AFTER `message`;
 ALTER TABLE `qgc_support_order`
   ADD UNIQUE INDEX `uk_request_id` (`request_id`) COMMENT '支付requestId幂等约束';
 
--- 4. 筹款分享码索引: Share归因安全校验
-ALTER TABLE `qgc_campaign`
-  ADD INDEX `idx_share_code` (`share_code`) COMMENT '分享码索引(归因校验)';
+-- 4. 分享记录share_code索引确认(share_record表已有idx_share_code, 此处确认幂等)
+-- 注意: share_code在qgc_share_record表, 不在qgc_campaign表
+-- RC2已创建: KEY `idx_share_code` (`share_code`)
 
 -- 5. 举报处理时间字段
 ALTER TABLE `qgc_report`

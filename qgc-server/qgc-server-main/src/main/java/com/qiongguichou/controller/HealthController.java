@@ -48,8 +48,19 @@ public class HealthController {
         try {
             jdbcTemplate.queryForObject("SELECT 1", Integer.class);
             result.put("database", "UP");
+
+            // 读取Schema版本
+            try {
+                String schemaVersion = jdbcTemplate.queryForObject(
+                    "SELECT version FROM qgc_schema_version ORDER BY applied_at DESC LIMIT 1", String.class);
+                result.put("schema_version", schemaVersion);
+            } catch (Exception e) {
+                result.put("schema_version", "unknown");
+                log.debug("健康检查: 无法读取schema版本(表可能不存在)", e);
+            }
         } catch (Exception e) {
             result.put("database", "DOWN");
+            result.put("schema_version", "unknown");
             result.put("status", "DEGRADED");
             log.warn("健康检查: 数据库连接异常", e);
         }
@@ -135,6 +146,16 @@ public class HealthController {
         Map<String, String> result = new LinkedHashMap<>();
         result.put("version", appVersion);
         result.put("timestamp", LocalDateTime.now().toString());
+
+        // 读取Schema版本
+        try {
+            String schemaVersion = jdbcTemplate.queryForObject(
+                "SELECT version FROM qgc_schema_version ORDER BY applied_at DESC LIMIT 1", String.class);
+            result.put("schema_version", schemaVersion);
+        } catch (Exception e) {
+            result.put("schema_version", "unknown");
+        }
+
         return result;
     }
 }

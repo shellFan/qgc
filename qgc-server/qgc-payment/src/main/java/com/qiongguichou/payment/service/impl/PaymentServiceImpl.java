@@ -20,7 +20,9 @@ import com.qiongguichou.common.result.ErrorCode;
 import com.qiongguichou.common.util.OrderNoUtil;
 import com.qiongguichou.common.util.UserContext;
 import com.qiongguichou.campaign.entity.Campaign;
+import com.qiongguichou.campaign.entity.ShareRecord;
 import com.qiongguichou.campaign.mapper.CampaignMapper;
+import com.qiongguichou.campaign.mapper.ShareRecordMapper;
 import com.qiongguichou.payment.config.QgcWxPayConfig;
 import com.qiongguichou.payment.dto.PayRequest;
 import com.qiongguichou.payment.dto.PayResult;
@@ -31,6 +33,7 @@ import com.qiongguichou.payment.mapper.PaymentOrderMapper;
 import com.qiongguichou.payment.mapper.RefundOrderMapper;
 import com.qiongguichou.payment.mapper.SupportOrderMapper;
 import com.qiongguichou.payment.service.PaymentService;
+import com.qiongguichou.wallet.service.WalletService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RLock;
@@ -55,9 +58,11 @@ public class PaymentServiceImpl implements PaymentService {
     private final PaymentOrderMapper paymentOrderMapper;
     private final RefundOrderMapper refundOrderMapper;
     private final CampaignMapper campaignMapper;
+    private final ShareRecordMapper shareRecordMapper;
     private final RedissonClient redissonClient;
     private final QgcWxPayConfig qgcWxPayConfig;
     private final ApplicationEventPublisher eventPublisher;
+    private final WalletService walletService;
 
     /** 微信支付服务，Mock模式下为null */
     private WxPayService wxPayService;
@@ -116,14 +121,15 @@ public class PaymentServiceImpl implements PaymentService {
             // RC5: shareCode归因验证 - 确保分享码属于当前筹款
             String shareCode = request.getShareCode();
             if (shareCode != null && !shareCode.isEmpty()) {
-                Campaign shareCampaign = campaignMapper.selectOne(
-                        new LambdaQueryWrapper<Campaign>()
-                                .eq(Campaign::getShareCode, shareCode)
+                ShareRecord shareRecord = shareRecordMapper.selectOne(
+                        new LambdaQueryWrapper<ShareRecord>()
+                                .eq(ShareRecord::getShareCode, shareCode)
                                 .last("LIMIT 1"));
-                if (shareCampaign == null || !shareCampaign.getId().equals(campaignId)) {
+                if (shareRecord == null || !shareRecord.getCampaignId().equals(campaignId)) {
                     log.warn("Share归因校验失败: shareCode={}, campaignId={}, 归属campaignId={}",
-                            shareCode, campaignId, shareCampaign != null ? shareCampaign.getId() : null);
-                    // 不阻断支付，仅记录警告
+                            shareCode, campaignId, shareRecord != null ? shareRecord.getCampaignId() : null);
+                    // 不阻断支付，仅记录警告，清除shareCode防止错误归因
+                    request.setShareCode(null);
                 }
             }
             Long remaining = campaign.getTargetAmount() - campaign.getRaisedAmount();
@@ -392,7 +398,10 @@ public class PaymentServiceImpl implements PaymentService {
     // ========== 内部方法 ==========
 
     /**
-     * 处理支付成功：更新支持订单 + 更新筹款已筹金额 + 检查超额退款
+     * 处理支付成功：更新支持订单 + 更新筹款已筹金额 + 钱包入账 + 检查超额退款
+     *
+     * 关键：钱包入账必须在同一事务内，确保payment/campaign/wallet数据一致性
+     * AFTER_COMMIT事件仅处理缓存清理等非关键逻辑
      */
     private void processPaySuccess(PaymentOrder paymentOrder) {
         // 1. 更新支持订单
@@ -411,8 +420,25 @@ public class PaymentServiceImpl implements PaymentService {
         Long paidAmount = paymentOrder.getEffectiveAmount();
         campaignMapper.updateRaisedAmount(paymentOrder.getCampaignId(), paidAmount);
 
-        // 3. 检查超额并自动退款
+        // 3. 钱包入账(必须在事务内，确保与payment/campaign一致)
         Campaign campaign = campaignMapper.selectById(paymentOrder.getCampaignId());
+        if (campaign != null) {
+            try {
+                walletService.campaignIncome(
+                        campaign.getCreatorUserId(),
+                        paidAmount,
+                        campaign.getId(),
+                        campaign.getTitle()
+                );
+            } catch (Exception e) {
+                // 钱包入账失败则回滚整个事务，避免payment成功但wallet未入账
+                log.error("钱包入账失败，事务将回滚: campaignId={}, creatorUserId={}, amount={}",
+                        campaign.getId(), campaign.getCreatorUserId(), paidAmount, e);
+                throw e;
+            }
+        }
+
+        // 4. 检查超额并自动退款
         if (campaign != null && campaign.getRaisedAmount() > campaign.getTargetAmount()) {
             Long overAmount = campaign.getRaisedAmount() - campaign.getTargetAmount();
             // 只退本次支付中超出的部分
@@ -425,7 +451,7 @@ public class PaymentServiceImpl implements PaymentService {
             }
         }
 
-        // 4. 检查筹款是否已满额，满额则更新状态
+        // 5. 检查筹款是否已满额，满额则更新状态
         if (campaign != null) {
             Campaign latestCampaign = campaignMapper.selectById(campaign.getId());
             if (latestCampaign != null && latestCampaign.getRaisedAmount().compareTo(latestCampaign.getTargetAmount()) >= 0) {
@@ -436,10 +462,12 @@ public class PaymentServiceImpl implements PaymentService {
             }
         }
 
-        // 5. 发布支付成功事件(事务提交后处理钱包入账+缓存清理)
-        eventPublisher.publishEvent(new PaySuccessEvent(
-                this, paymentOrder.getCampaignId(), campaign.getCreatorUserId(),
-                paymentOrder.getSupporterUserId(), paidAmount, campaign.getTitle()));
+        // 6. 发布支付成功事件(事务提交后处理缓存清理等非关键逻辑)
+        if (campaign != null) {
+            eventPublisher.publishEvent(new PaySuccessEvent(
+                    this, paymentOrder.getCampaignId(), campaign.getCreatorUserId(),
+                    paymentOrder.getSupporterUserId(), paidAmount, campaign.getTitle()));
+        }
     }
 
     /**

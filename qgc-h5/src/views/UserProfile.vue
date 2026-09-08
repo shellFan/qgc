@@ -136,7 +136,7 @@ async function fetchProfile() {
 
 async function fetchLevel() {
   try {
-    const url = isMine.value ? '/api/user/level/mine' : `/api/user/level/${userId.value}`
+    const url = isMine.value ? '/api/user/profile/level' : `/api/user/profile/${userId.value}`
     const res = await fetch(url).then(r => r.json())
     levelInfo.value = res?.data || null
   } catch { /* ignore */ }
@@ -144,7 +144,7 @@ async function fetchLevel() {
 
 async function fetchBadges() {
   try {
-    const url = isMine.value ? '/api/user/badges/mine' : `/api/user/badges/${userId.value}`
+    const url = isMine.value ? '/api/user/profile/badges' : `/api/user/profile/${userId.value}`
     const res = await fetch(url).then(r => r.json())
     badges.value = res?.data || []
   } catch { /* ignore */ }
@@ -153,7 +153,7 @@ async function fetchBadges() {
 async function fetchPoints() {
   if (!isMine.value) return
   try {
-    const res = await fetch('/api/user/points/mine').then(r => r.json())
+    const res = await fetch('/api/user/profile/points').then(r => r.json())
     pointsInfo.value = res?.data || {}
   } catch { /* ignore */ }
 }
@@ -161,7 +161,7 @@ async function fetchPoints() {
 async function fetchPointsFlow() {
   if (!isMine.value) return
   try {
-    const res = await fetch('/api/user/points/mine/flow?page=1&size=20').then(r => r.json())
+    const res = await fetch('/api/user/profile/points/flow').then(r => r.json())
     pointsFlow.value = res?.data?.records || res?.data || []
   } catch { /* ignore */ }
 }

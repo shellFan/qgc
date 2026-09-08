@@ -38,22 +38,22 @@ qgc:
     path: ${QGC_UPLOAD_PATH:/data/qgc/uploads/}
     max-size: 5242880  # 5MB
 
-  # 微信公众号 - Staging使用测试号
+  # 微信公众号 - Staging使用测试号(CONFIG REQUIRED: 有真实配置时设为false)
   wechat:
-    mock-enabled: false  # Staging接入真实微信
+    mock-enabled: ${QGC_WECHAT_MOCK:true}
     mp:
-      appId: ${WX_MP_APPID}  # 测试公众号AppID
-      secret: ${WX_MP_SECRET}  # 测试公众号Secret
-      token: ${WX_MP_TOKEN}  # 测试公众号Token
-      aesKey: ${WX_MP_AES_KEY:}  # 可选，消息加密
+      appId: ${WX_MP_APPID:}
+      secret: ${WX_MP_SECRET:}
+      token: ${WX_MP_TOKEN:}
+      aesKey: ${WX_MP_AES_KEY:}
 
-  # 微信支付 - Staging使用沙箱环境
+  # 微信支付 - Staging使用沙箱环境(CONFIG REQUIRED: 有真实配置时设为false)
   pay:
-    mock-enabled: false  # Staging接入真实微信支付
-    appId: ${WX_PAY_APPID}  # 测试公众号AppID
-    mchId: ${WX_PAY_MCH_ID}  # 测试商户号
-    mchKey: ${WX_PAY_MCH_KEY}  # 测试商户密钥
-    notifyUrl: ${WX_PAY_NOTIFY_URL}  # 必须设置，外网可访问的回调URL
+    mock-enabled: ${QGC_PAY_MOCK:true}
+    appId: ${WX_PAY_APPID:}
+    mchId: ${WX_PAY_MCH_ID:}
+    mchKey: ${WX_PAY_MCH_KEY:}
+    notifyUrl: ${WX_PAY_NOTIFY_URL:}
 
 # Swagger - Staging环境开启(仅限内部访问)
 springfox:

@@ -62,17 +62,17 @@ export const getRankingHistory = (type, params) => request.get(`/api/ranking/${t
 
 // ====== 分享 ======
 export const recordShare = (data) => request.post('/api/share', data)
-export const trackShareVisit = (data) => request.post('/api/share/visit', data)
-export const getShareStats = (campaignId) => request.get(`/api/share/stats/${campaignId}`)
+export const trackShareVisit = (shareCode, data) => request.post(`/api/share/visit/${shareCode}`, data)
+export const getShareStats = (campaignId) => request.get(`/api/share/campaign/${campaignId}`)
 
 // ====== 用户等级/徽章/积分 ======
-export const getUserLevel = (userId) => request.get(`/api/user/level/${userId}`)
-export const getMyLevel = () => request.get('/api/user/level/mine')
-export const getUserBadges = (userId) => request.get(`/api/user/badges/${userId}`)
-export const getMyBadges = () => request.get('/api/user/badges/mine')
-export const getUserPoints = (userId) => request.get(`/api/user/points/${userId}`)
-export const getMyPoints = () => request.get('/api/user/points/mine')
-export const getMyPointsFlow = (params) => request.get('/api/user/points/mine/flow', { params })
+export const getUserLevel = (userId) => request.get(`/api/user/profile/${userId}`)
+export const getMyLevel = () => request.get('/api/user/profile/level')
+export const getUserBadges = (userId) => request.get(`/api/user/profile/${userId}`)
+export const getMyBadges = () => request.get('/api/user/profile/badges')
+export const getUserPoints = (userId) => request.get(`/api/user/profile/${userId}`)
+export const getMyPoints = () => request.get('/api/user/profile/points')
+export const getMyPointsFlow = (params) => request.get('/api/user/profile/points/flow', { params })
 export const getUserProfile = (userId) => request.get(`/api/user/profile/${userId}`)
 export const getMyProfile = () => request.get('/api/user/profile/mine')
 
