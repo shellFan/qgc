@@ -31,6 +31,7 @@ export const unlikeProof = (proofId) => request.delete(`/api/campaign/proof/${pr
 
 // ====== 支付 ======
 export const createPayment = (data) => request.post('/api/payment/pay', data)
+export const getPaymentStatus = (orderNo) => request.get(`/api/payment/${orderNo}/status`)
 
 // ====== 钱包 ======
 export const getWallet = () => request.get('/api/wallet')

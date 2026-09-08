@@ -44,14 +44,17 @@
         </van-button>
       </div>
     </div>
+
+    <!-- 支付结果弹窗 -->
+    <van-dialog v-model:show="showResult" :title="resultTitle" :message="resultMsg" @confirm="onResultConfirm" />
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { showToast, showDialog } from 'vant'
-import { getCampaignDetail, createPayment } from '@/api'
+import { showToast, showLoadingToast, closeToast } from 'vant'
+import { getCampaignDetail, createPayment, getPaymentStatus } from '@/api'
 import { formatMoney, yuanToFen } from '@/utils/money'
 
 const route = useRoute()
@@ -63,8 +66,132 @@ const message = ref('')
 const anonymous = ref(false)
 const hideAmount = ref(false)
 const paying = ref(false)
+const showResult = ref(false)
+const resultTitle = ref('')
+const resultMsg = ref('')
 
 const quickAmounts = [1, 5, 10, 20, 50, 100]
+
+/** 轮询相关 */
+let pollTimer = null
+let currentOrderNo = null
+
+/** 检测是否在微信浏览器内 */
+function isWechatBrowser() {
+  const ua = navigator.userAgent.toLowerCase()
+  return ua.indexOf('micromessenger') !== -1
+}
+
+/** 调用微信JSAPI支付 */
+function callWxPay(payParams) {
+  return new Promise((resolve, reject) => {
+    if (typeof WeixinJSBridge === 'undefined') {
+      // 等待WeixinJSBridge就绪
+      if (document.addEventListener) {
+        document.addEventListener('WeixinJSBridgeReady', () => {
+          onBridgeReady(payParams, resolve, reject)
+        }, false)
+      }
+    } else {
+      onBridgeReady(payParams, resolve, reject)
+    }
+  })
+}
+
+function onBridgeReady(payParams, resolve, reject) {
+  WeixinJSBridge.invoke(
+    'getBrandWCPayRequest',
+    {
+      appId: payParams.appId,
+      timeStamp: payParams.timeStamp,
+      nonceStr: payParams.nonceStr,
+      package: payParams.packageValue,
+      signType: payParams.signType || 'RSA',
+      paySign: payParams.paySign
+    },
+    (res) => {
+      // 注意：res.err_msg仅代表前端调用结果，不等于支付成功
+      // 必须通过后端轮询确认真实支付状态
+      if (res.err_msg === 'get_brand_wcpay_request:ok') {
+        // 用户点击了完成，开始轮询
+        resolve('ok')
+      } else if (res.err_msg === 'get_brand_wcpay_request:cancel') {
+        // 用户取消支付，不标FAIL，订单保持CREATED/PAYING
+        resolve('cancel')
+      } else {
+        // 调用失败
+        reject(new Error(res.err_msg || '支付调用失败'))
+      }
+    }
+  )
+}
+
+/** 轮询支付状态 */
+function startPolling(orderNo) {
+  currentOrderNo = orderNo
+  let pollCount = 0
+  const maxPolls = 30 // 最多轮询30次，约30秒
+
+  const doPoll = async () => {
+    try {
+      const res = await getPaymentStatus(orderNo)
+      const status = res.data?.status
+      pollCount++
+
+      if (status === 'SUCCESS') {
+        stopPolling()
+        closeToast()
+        resultTitle.value = '投喂成功'
+        resultMsg.value = `成功投喂 ${formatMoney(yuanToFen(amountYuan.value))}，感谢义父！`
+        showResult.value = true
+        return
+      }
+
+      if (status === 'FAIL' || status === 'CLOSED') {
+        stopPolling()
+        closeToast()
+        resultTitle.value = '支付失败'
+        resultMsg.value = status === 'CLOSED' ? '订单已关闭' : '支付失败，请重试'
+        showResult.value = true
+        return
+      }
+
+      // CREATED/PAYING 继续轮询
+      if (pollCount >= maxPolls) {
+        stopPolling()
+        closeToast()
+        showToast('支付结果确认中，请稍后查看订单')
+        router.replace(`/campaign/${campaign.value.id}`)
+      }
+    } catch (e) {
+      console.error('轮询支付状态失败:', e)
+      // 网络错误继续轮询
+      if (pollCount >= maxPolls) {
+        stopPolling()
+        closeToast()
+        showToast('网络异常，请稍后查看订单')
+        router.replace(`/campaign/${campaign.value.id}`)
+      }
+    }
+  }
+
+  // 立即查一次
+  doPoll()
+  // 每1秒轮询
+  pollTimer = setInterval(doPoll, 1000)
+}
+
+function stopPolling() {
+  if (pollTimer) {
+    clearInterval(pollTimer)
+    pollTimer = null
+  }
+  currentOrderNo = null
+}
+
+function onResultConfirm() {
+  router.replace(`/campaign/${campaign.value.id}`)
+}
 
 async function fetchCampaign() {
   const id = route.query.campaignId
@@ -89,17 +216,52 @@ async function handlePay() {
       requestId: `pay_${campaign.value.id}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
     }
     const res = await createPayment(data)
-    // Mock模式直接返回成功
-    showDialog({ title: '投喂成功', message: `成功投喂 ${formatMoney(yuanToFen(amountYuan.value))}，感谢义父！` }).then(() => {
-      router.replace(`/campaign/${campaign.value.id}`)
-    })
-  } catch { /* error handled by interceptor */ } finally {
+    const payResult = res.data
+
+    if (payResult.mock) {
+      // Mock模式：直接成功
+      resultTitle.value = '投喂成功'
+      resultMsg.value = `成功投喂 ${formatMoney(yuanToFen(amountYuan.value))}，感谢义父！(Mock模式)`
+      showResult.value = true
+      return
+    }
+
+    // 真实JSAPI支付
+    if (isWechatBrowser() && payResult.wxPayParams) {
+      // 调用微信JSAPI支付
+      try {
+        const wxResult = await callWxPay(payResult.wxPayParams)
+        if (wxResult === 'cancel') {
+          // 用户取消，不标FAIL，提示用户
+          showToast('已取消支付')
+          return
+        }
+        // wxResult === 'ok'，开始轮询确认支付状态
+        showLoadingToast({ message: '确认支付结果...', forbidClick: true, duration: 0 })
+        startPolling(payResult.paymentOrderNo)
+      } catch (e) {
+        showToast('支付调用失败: ' + (e.message || '未知错误'))
+      }
+    } else if (payResult.paymentOrderNo) {
+      // 非微信浏览器或无wxPayParams，轮询等待(可能是H5支付或已支付)
+      showLoadingToast({ message: '确认支付结果...', forbidClick: true, duration: 0 })
+      startPolling(payResult.paymentOrderNo)
+    } else {
+      showToast('支付参数异常')
+    }
+  } catch (e) {
+    // error handled by interceptor
+  } finally {
     paying.value = false
   }
 }
 
 onMounted(() => {
   fetchCampaign()
+})
+
+onUnmounted(() => {
+  stopPolling()
 })
 </script>
 

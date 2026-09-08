@@ -180,6 +180,7 @@ public class PaymentServiceImpl implements PaymentService {
             if (qgcWxPayConfig.isMockEnabled()) {
                 // Mock模式：直接返回成功，模拟支付回调
                 handleMockPaySuccess(paymentOrder, supportOrder, campaign);
+                result.setMock(true);
                 result.setWxPayParams(null);
             } else {
                 // 真实微信支付
@@ -204,6 +205,17 @@ public class PaymentServiceImpl implements PaymentService {
                 lock.unlock();
             }
         }
+    }
+
+    /**
+     * 根据订单号查询支付订单（前端轮询用）
+     */
+    @Override
+    public PaymentOrder getByOrderNo(String orderNo) {
+        return paymentOrderMapper.selectOne(
+                new LambdaQueryWrapper<PaymentOrder>()
+                        .eq(PaymentOrder::getOrderNo, orderNo)
+                        .last("LIMIT 1"));
     }
 
     /**

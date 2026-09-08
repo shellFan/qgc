@@ -14,7 +14,10 @@ public class PayResult {
     /** 支付订单号 */
     private String paymentOrderNo;
 
-    /** 微信JSAPI支付参数 */
+    /** 是否Mock模式 */
+    private boolean mock;
+
+    /** 微信JSAPI支付参数(真实模式下才有) */
     private WxPayParams wxPayParams;
 
     @Data

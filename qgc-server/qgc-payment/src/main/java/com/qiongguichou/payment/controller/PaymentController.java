@@ -4,6 +4,7 @@ import com.qiongguichou.common.result.Result;
 import com.qiongguichou.common.util.UserContext;
 import com.qiongguichou.payment.dto.PayRequest;
 import com.qiongguichou.payment.dto.PayResult;
+import com.qiongguichou.payment.entity.PaymentOrder;
 import com.qiongguichou.payment.service.PaymentService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -11,6 +12,8 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 支付控制器
@@ -64,6 +67,29 @@ public class PaymentController {
             log.error("退款回调异常", e);
             return "FAIL";
         }
+    }
+
+    /**
+     * 查询支付状态（前端轮询用）
+     * GET /api/payment/{orderNo}/status
+     * 前端JSAPI支付后轮询此接口确认支付结果
+     */
+    @GetMapping("/{orderNo}/status")
+    public Result<Map<String, Object>> getPaymentStatus(@PathVariable String orderNo) {
+        Long userId = UserContext.getUserId();
+        PaymentOrder payment = paymentService.getByOrderNo(orderNo);
+        if (payment == null) {
+            return Result.error(1, "订单不存在");
+        }
+        // 安全校验：只能查自己的订单
+        if (!payment.getSupporterUserId().equals(userId)) {
+            return Result.error(1, "无权查看此订单");
+        }
+        Map<String, Object> data = new HashMap<>();
+        data.put("orderNo", payment.getOrderNo());
+        data.put("status", payment.getStatus());
+        data.put("amount", payment.getAmount());
+        return Result.success(data);
     }
 
     private String readBody(HttpServletRequest request) throws Exception {

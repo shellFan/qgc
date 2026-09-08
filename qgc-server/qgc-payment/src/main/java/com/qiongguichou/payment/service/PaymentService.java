@@ -2,6 +2,7 @@ package com.qiongguichou.payment.service;
 
 import com.qiongguichou.payment.dto.PayRequest;
 import com.qiongguichou.payment.dto.PayResult;
+import com.qiongguichou.payment.entity.PaymentOrder;
 
 import java.util.Map;
 
@@ -14,6 +15,11 @@ public interface PaymentService {
      * 发起支付
      */
     PayResult pay(Long userId, String openid, PayRequest request);
+
+    /**
+     * 根据订单号查询支付订单（前端轮询用）
+     */
+    PaymentOrder getByOrderNo(String orderNo);
 
     /**
      * 微信支付回调处理
