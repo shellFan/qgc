@@ -52,6 +52,8 @@ public enum ErrorCode {
     PAYMENT_DUPLICATE(50005, "重复支付"),
     PAYMENT_NOTIFY_INVALID(50006, "支付回调无效"),
     PAYMENT_NOTIFY_VERIFY_FAIL(50007, "支付回调验签失败"),
+    PAYMENT_REFUND_FAIL(50008, "退款失败"),
+    PAYMENT_PARAMS_ERROR(50009, "支付参数错误"),
 
     // 钱包错误 60xxx
     WALLET_NOT_FOUND(60001, "钱包不存在"),

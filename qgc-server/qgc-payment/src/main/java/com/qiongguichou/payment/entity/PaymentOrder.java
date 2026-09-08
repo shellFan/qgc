@@ -42,8 +42,20 @@ public class PaymentOrder {
     /** 交易类型 */
     private String tradeType;
 
+    /** 支付类型: MOCK/NATIVE/JSAPI */
+    private String payType;
+
     /** 支付者openid */
     private String openid;
+
+    /** Native支付二维码URL(weixin://wxpay/...) */
+    private String codeUrl;
+
+    /** Native支付过期时间 */
+    private LocalDateTime expireTime;
+
+    /** 支付请求ID(客户端生成，幂等防重复) */
+    private String requestId;
 
     /** 预支付ID(prepay_id) */
     private String prepayId;

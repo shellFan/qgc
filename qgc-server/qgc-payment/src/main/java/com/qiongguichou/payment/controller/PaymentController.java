@@ -17,6 +17,10 @@ import java.util.Map;
 
 /**
  * 支付控制器
+ * 支持三种支付模式: MOCK/NATIVE/JSAPI
+ * - MOCK: 开发环境模拟
+ * - NATIVE: 扫码支付, 返回code_url
+ * - JSAPI: 微信公众号支付, 返回wxPayParams
  */
 @Slf4j
 @RestController
@@ -29,6 +33,7 @@ public class PaymentController {
     /**
      * 发起支付
      * POST /api/payment/pay
+     * payType参数可选, 不传则使用后端配置的默认模式
      */
     @PostMapping("/pay")
     public Result<PayResult> pay(@RequestBody @Validated PayRequest request) {
@@ -42,6 +47,7 @@ public class PaymentController {
      * 微信支付回调
      * POST /api/payment/notify/pay
      * 注意：此接口不需要登录，由微信服务器调用
+     * 不需要JWT/OAuth/RateLimit/CSRF, 需要APIv3验签+解密+金额/mchid校验
      */
     @PostMapping("/notify/pay")
     public String handlePayNotify(HttpServletRequest request) {
@@ -72,7 +78,8 @@ public class PaymentController {
     /**
      * 查询支付状态（前端轮询用）
      * GET /api/payment/{orderNo}/status
-     * 前端JSAPI支付后轮询此接口确认支付结果
+     * 前端JSAPI/Native支付后轮询此接口确认支付结果
+     * 返回payType供前端区分支付模式
      */
     @GetMapping("/{orderNo}/status")
     public Result<Map<String, Object>> getPaymentStatus(@PathVariable String orderNo) {
@@ -89,6 +96,14 @@ public class PaymentController {
         data.put("orderNo", payment.getOrderNo());
         data.put("status", payment.getStatus());
         data.put("amount", payment.getAmount());
+        data.put("payType", payment.getPayType());
+        // Native支付: 返回codeUrl和过期时间(用于二维码刷新)
+        if (payment.getCodeUrl() != null) {
+            data.put("codeUrl", payment.getCodeUrl());
+        }
+        if (payment.getExpireTime() != null) {
+            data.put("expireTime", payment.getExpireTime().toString());
+        }
         return Result.success(data);
     }
 

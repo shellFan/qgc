@@ -10,6 +10,7 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum RefundStatus {
     PENDING("待处理"),
+    PROCESSING("退款中"),
     SUCCESS("退款成功"),
     FAIL("退款失败");
 

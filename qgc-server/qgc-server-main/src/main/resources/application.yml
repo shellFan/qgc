@@ -80,7 +80,10 @@ qgc:
 
   # 微信支付配置
   pay:
-    mock-enabled: ${QGC_PAY_MOCK:true}  # 生产环境必须设为false
+    mode: ${QGC_PAY_MODE:MOCK}  # 支付模式: MOCK/NATIVE/JSAPI
+    merchant-mode: ${QGC_PAY_MERCHANT_MODE:DIRECT}  # 商户模式: DIRECT(普通商户)
+    native-expire-minutes: ${QGC_PAY_NATIVE_EXPIRE_MINUTES:5}  # Native二维码过期时间(分钟)
+    mock-enabled: ${QGC_PAY_MOCK:true}  # 兼容旧配置, 优先使用mode
     appId: ${WX_PAY_APPID:wx_mock_appid}
     mchId: ${WX_PAY_MCH_ID:mock_mch_id}
     mchKey: ${WX_PAY_MCH_KEY:mock_mch_key}
@@ -88,7 +91,7 @@ qgc:
     privateKeyPath: ${WX_PAY_PRIVATE_KEY_PATH:}
     certificateSerialNo: ${WX_PAY_CERTIFICATE_SERIAL_NO:}
     certPath: ${WX_PAY_CERT_PATH:}
-    notifyUrl: ${WX_PAY_NOTIFY_URL:http://localhost:8080/api/pay/notify}
+    notifyUrl: ${WX_PAY_NOTIFY_URL:http://localhost:8080/api/payment/notify/pay}
     refundNotifyUrl: ${WX_PAY_REFUND_NOTIFY_URL:}
 
 # Swagger配置

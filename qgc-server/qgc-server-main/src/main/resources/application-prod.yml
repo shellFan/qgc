@@ -30,8 +30,11 @@ qgc:
       token: ${WX_MP_TOKEN}
       aesKey: ${WX_MP_AES_KEY}
   pay:
+    mode: ${QGC_PAY_MODE:NATIVE}  # 生产环境默认Native扫码支付
+    merchant-mode: ${QGC_PAY_MERCHANT_MODE:DIRECT}
+    native-expire-minutes: ${QGC_PAY_NATIVE_EXPIRE_MINUTES:5}
     mock-enabled: false  # 生产环境禁止Mock支付
-    appId: ${WX_PAY_APPID}
+    appId: ${WX_PAY_APPID:}  # Native模式不强制需要appId
     mchId: ${WX_PAY_MCH_ID}
     mchKey: ${WX_PAY_MCH_KEY}
     apiV3Key: ${WX_PAY_API_V3_KEY}

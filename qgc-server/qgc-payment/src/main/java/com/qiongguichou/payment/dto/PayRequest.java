@@ -33,4 +33,7 @@ public class PayRequest {
 
     /** 分享码(用于归因追踪，可选) */
     private String shareCode;
+
+    /** 支付类型(可选): MOCK/NATIVE/JSAPI, 不传则由后端根据配置决定 */
+    private String payType;
 }
