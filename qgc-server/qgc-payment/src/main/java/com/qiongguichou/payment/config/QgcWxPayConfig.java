@@ -60,6 +60,9 @@ public class QgcWxPayConfig {
     @Bean
     @ConditionalOnProperty(name = "qgc.pay.mock-enabled", havingValue = "false", matchIfMissing = false)
     public WxPayService wxPayService() {
+        // 启动保护：真实支付模式下校验必填配置
+        validatePayConfig();
+
         WxPayConfig payConfig = new WxPayConfig();
         payConfig.setAppId(appId);
         payConfig.setMchId(mchId);
@@ -73,5 +76,23 @@ public class QgcWxPayConfig {
         WxPayService wxPayService = new WxPayServiceImpl();
         wxPayService.setConfig(payConfig);
         return wxPayService;
+    }
+
+    /**
+     * 启动保护：真实支付模式下校验必填配置
+     * 缺少配置时启动失败，明确指出缺少哪个配置项
+     * 绝对不打印secret内容
+     */
+    private void validatePayConfig() {
+        StringBuilder missing = new StringBuilder();
+        if (appId == null || appId.isEmpty()) missing.append(" QGC_PAY_APPID(qgc.pay.app-id)");
+        if (mchId == null || mchId.isEmpty()) missing.append(" QGC_PAY_MCH_ID(qgc.pay.mch-id)");
+        if (apiV3Key == null || apiV3Key.isEmpty()) missing.append(" QGC_PAY_API_V3_KEY(qgc.pay.api-v3-key)");
+        if (privateKeyPath == null || privateKeyPath.isEmpty()) missing.append(" QGC_PAY_PRIVATE_KEY_PATH(qgc.pay.private-key-path)");
+        if (certificateSerialNo == null || certificateSerialNo.isEmpty()) missing.append(" QGC_PAY_CERTIFICATE_SERIAL_NO(qgc.pay.certificate-serial-no)");
+        if (notifyUrl == null || notifyUrl.isEmpty()) missing.append(" QGC_PAY_NOTIFY_URL(qgc.pay.notify-url)");
+        if (missing.length() > 0) {
+            throw new IllegalStateException("Missing required payment config:" + missing);
+        }
     }
 }

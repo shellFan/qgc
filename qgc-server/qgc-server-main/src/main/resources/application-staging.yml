@@ -40,7 +40,9 @@ qgc:
 
   # 微信公众号 - Staging使用测试号(CONFIG REQUIRED: 有真实配置时设为false)
   wechat:
-    mock-enabled: ${QGC_WECHAT_MOCK:true}
+    mock-enabled: ${QGC_WECHAT_MOCK:false}
+    callback-base-url: ${QGC_WECHAT_CALLBACK_BASE_URL:}
+    allowed-domains: ${QGC_WECHAT_ALLOWED_DOMAINS:}
     mp:
       appId: ${WX_MP_APPID:}
       secret: ${WX_MP_SECRET:}
@@ -49,11 +51,16 @@ qgc:
 
   # 微信支付 - Staging使用沙箱环境(CONFIG REQUIRED: 有真实配置时设为false)
   pay:
-    mock-enabled: ${QGC_PAY_MOCK:true}
+    mock-enabled: ${QGC_PAY_MOCK:false}
     appId: ${WX_PAY_APPID:}
     mchId: ${WX_PAY_MCH_ID:}
     mchKey: ${WX_PAY_MCH_KEY:}
+    apiV3Key: ${WX_PAY_API_V3_KEY:}
+    privateKeyPath: ${WX_PAY_PRIVATE_KEY_PATH:}
+    certificateSerialNo: ${WX_PAY_CERTIFICATE_SERIAL_NO:}
+    certPath: ${WX_PAY_CERT_PATH:}
     notifyUrl: ${WX_PAY_NOTIFY_URL:}
+    refundNotifyUrl: ${WX_PAY_REFUND_NOTIFY_URL:}
 
 # Swagger - Staging环境开启(仅限内部访问)
 springfox:

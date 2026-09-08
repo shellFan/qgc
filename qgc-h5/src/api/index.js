@@ -3,7 +3,7 @@ import request from '@/utils/request'
 // ====== 认证 ======
 export const devLogin = (data) => request.post('/dev/login', data)
 export const devLoginByOpenid = (data) => request.post('/dev/login-by-openid', data)
-export const getAuthorizeUrl = () => request.get('/api/auth/authorize-url')
+export const getAuthorizeUrl = (params) => request.get('/api/auth/authorize-url', { params })
 export const authCallback = (params) => request.get('/api/auth/callback', { params })
 export const getJsSdkConfig = (params) => request.get('/api/auth/jssdk-config', { params })
 

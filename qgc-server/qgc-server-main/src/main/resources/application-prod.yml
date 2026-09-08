@@ -22,6 +22,8 @@ qgc:
     mock-enabled: false  # 生产环境禁止Mock登录
   wechat:
     mock-enabled: false  # 生产环境禁止Mock微信
+    callback-base-url: ${QGC_WECHAT_CALLBACK_BASE_URL}
+    allowed-domains: ${QGC_WECHAT_ALLOWED_DOMAINS}
     mp:
       appId: ${WX_MP_APPID}
       secret: ${WX_MP_SECRET}
@@ -32,7 +34,12 @@ qgc:
     appId: ${WX_PAY_APPID}
     mchId: ${WX_PAY_MCH_ID}
     mchKey: ${WX_PAY_MCH_KEY}
+    apiV3Key: ${WX_PAY_API_V3_KEY}
+    privateKeyPath: ${WX_PAY_PRIVATE_KEY_PATH}
+    certificateSerialNo: ${WX_PAY_CERTIFICATE_SERIAL_NO}
+    certPath: ${WX_PAY_CERT_PATH}
     notifyUrl: ${WX_PAY_NOTIFY_URL}
+    refundNotifyUrl: ${WX_PAY_REFUND_NOTIFY_URL}
 
 mybatis-plus:
   configuration:

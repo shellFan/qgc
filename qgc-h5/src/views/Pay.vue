@@ -160,8 +160,10 @@ function startPolling(orderNo) {
       if (pollCount >= maxPolls) {
         stopPolling()
         closeToast()
-        showToast('支付结果确认中，请稍后查看订单')
-        router.replace(`/campaign/${campaign.value.id}`)
+        // 超时不显示"支付失败"，提示"支付结果确认中"
+        resultTitle.value = '支付结果确认中'
+        resultMsg.value = '支付结果正在确认中，请稍后在订单中查看'
+        showResult.value = true
       }
     } catch (e) {
       console.error('轮询支付状态失败:', e)
@@ -169,8 +171,9 @@ function startPolling(orderNo) {
       if (pollCount >= maxPolls) {
         stopPolling()
         closeToast()
-        showToast('网络异常，请稍后查看订单')
-        router.replace(`/campaign/${campaign.value.id}`)
+        resultTitle.value = '网络异常'
+        resultMsg.value = '网络异常，支付结果正在确认中，请稍后查看订单'
+        showResult.value = true
       }
     }
   }
@@ -227,7 +230,13 @@ async function handlePay() {
     }
 
     // 真实JSAPI支付
-    if (isWechatBrowser() && payResult.wxPayParams) {
+    if (!isWechatBrowser()) {
+      // 非微信浏览器：提示用户使用微信打开，不报JS error
+      showToast('请使用微信打开后支付')
+      return
+    }
+
+    if (payResult.wxPayParams) {
       // 调用微信JSAPI支付
       try {
         const wxResult = await callWxPay(payResult.wxPayParams)
@@ -243,7 +252,7 @@ async function handlePay() {
         showToast('支付调用失败: ' + (e.message || '未知错误'))
       }
     } else if (payResult.paymentOrderNo) {
-      // 非微信浏览器或无wxPayParams，轮询等待(可能是H5支付或已支付)
+      // 有订单号但无支付参数，轮询等待(可能是已支付状态)
       showLoadingToast({ message: '确认支付结果...', forbidClick: true, duration: 0 })
       startPolling(payResult.paymentOrderNo)
     } else {

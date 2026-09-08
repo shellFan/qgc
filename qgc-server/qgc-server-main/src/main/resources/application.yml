@@ -70,6 +70,8 @@ qgc:
   # 微信配置
   wechat:
     mock-enabled: ${QGC_WECHAT_MOCK:true}  # 生产环境必须设为false
+    callback-base-url: ${QGC_WECHAT_CALLBACK_BASE_URL:}
+    allowed-domains: ${QGC_WECHAT_ALLOWED_DOMAINS:}
     mp:
       appId: ${WX_MP_APPID:wx_mock_appid}
       secret: ${WX_MP_SECRET:mock_secret}
@@ -82,7 +84,12 @@ qgc:
     appId: ${WX_PAY_APPID:wx_mock_appid}
     mchId: ${WX_PAY_MCH_ID:mock_mch_id}
     mchKey: ${WX_PAY_MCH_KEY:mock_mch_key}
+    apiV3Key: ${WX_PAY_API_V3_KEY:}
+    privateKeyPath: ${WX_PAY_PRIVATE_KEY_PATH:}
+    certificateSerialNo: ${WX_PAY_CERTIFICATE_SERIAL_NO:}
+    certPath: ${WX_PAY_CERT_PATH:}
     notifyUrl: ${WX_PAY_NOTIFY_URL:http://localhost:8080/api/pay/notify}
+    refundNotifyUrl: ${WX_PAY_REFUND_NOTIFY_URL:}
 
 # Swagger配置
 springfox:
