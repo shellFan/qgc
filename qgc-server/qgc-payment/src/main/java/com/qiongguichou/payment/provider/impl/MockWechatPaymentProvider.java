@@ -6,14 +6,17 @@ import com.qiongguichou.payment.provider.NotifyResult;
 import com.qiongguichou.payment.provider.PaymentProvider;
 import com.qiongguichou.payment.provider.PaymentResult;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 /**
  * Mock支付提供者 - 开发环境模拟支付
  * 所有操作直接返回成功，不调用真实微信API
+ * 仅在qgc.pay.mode=MOCK或未配置时加载
  */
 @Slf4j
 @Component
+@ConditionalOnProperty(name = "qgc.pay.mode", havingValue = "MOCK", matchIfMissing = true)
 public class MockWechatPaymentProvider implements PaymentProvider {
 
     @Override

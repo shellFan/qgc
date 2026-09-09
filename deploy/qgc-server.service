@@ -1,0 +1,41 @@
+[Unit]
+Description=QGC Server (qiongguichou)
+After=network.target mysql.service redis.service
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/qgc/app
+ExecStart=/usr/bin/java -Xmx512m -Xms256m -jar /opt/qgc/app/qgc-server.jar --spring.profiles.active=prod --spring.config.additional-location=file:/opt/qgc/app/
+Restart=on-failure
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+LimitNOFILE=65536
+
+Environment=JWT_SECRET=qiongguichou2026prodSecretKey
+Environment=CORS_ALLOWED_ORIGINS=https://pay.21zuo.com
+Environment=QGC_AUTH_MOCK=false
+Environment=QGC_WECHAT_MOCK=false
+Environment=QGC_WECHAT_CALLBACK_BASE_URL=https://pay.21zuo.com
+Environment=QGC_WECHAT_ALLOWED_DOMAINS=pay.21zuo.com
+Environment=WX_MP_APPID=wx_mock_appid
+Environment=WX_MP_SECRET=mock_secret
+Environment=WX_MP_TOKEN=mock_token
+Environment=WX_MP_AES_KEY=mock_aes_key
+Environment=QGC_PAY_MODE=NATIVE
+Environment=QGC_PAY_MERCHANT_MODE=DIRECT
+Environment=QGC_PAY_NATIVE_EXPIRE_MINUTES=5
+Environment=QGC_PAY_MOCK=false
+Environment=WX_PAY_APPID=
+Environment=WX_PAY_MCH_ID=1673666733
+Environment=WX_PAY_MCH_KEY=
+Environment=WX_PAY_API_V3_KEY=A7b9C2d4E6f8G1h3J5k7L9m2N4p6Q8r0
+Environment=WX_PAY_PRIVATE_KEY_PATH=/opt/qgc/cert/jnaapiclient_key.pem
+Environment=WX_PAY_CERTIFICATE_SERIAL_NO=PUB_KEY_ID_0116736667332026090800111956001001
+Environment=WX_PAY_CERT_PATH=/opt/qgc/cert/jnaapiclient_cert.p12
+Environment=WX_PAY_NOTIFY_URL=https://pay.21zuo.com/api/wechat/pay/notify
+Environment=WX_PAY_REFUND_NOTIFY_URL=https://pay.21zuo.com/api/wechat/refund/notify
+
+[Install]
+WantedBy=multi-user.target

@@ -34,7 +34,6 @@ public class AdminWithdrawServiceImpl implements AdminWithdrawService {
     private final WithdrawOrderMapper withdrawOrderMapper;
     private final WalletMapper walletMapper;
     private final WalletFlowMapper walletFlowMapper;
-    private final OrderNoUtil orderNoUtil;
 
     @Override
     public IPage<WithdrawOrder> listWithdrawOrders(Page<WithdrawOrder> page, String status) {

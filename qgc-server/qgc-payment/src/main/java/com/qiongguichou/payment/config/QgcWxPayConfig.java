@@ -9,6 +9,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 
 /**
  * 微信支付配置 - 支持MOCK/NATIVE/JSAPI三种模式
@@ -103,6 +104,7 @@ public class QgcWxPayConfig {
      * NATIVE和JSAPI模式都需要WxPayService
      */
     @Bean
+    @Primary
     @ConditionalOnProperty(name = "qgc.pay.mode", havingValue = "NATIVE")
     public WxPayService wxPayServiceNative() {
         validatePayConfig();
@@ -110,6 +112,7 @@ public class QgcWxPayConfig {
     }
 
     @Bean
+    @Primary
     @ConditionalOnProperty(name = "qgc.pay.mode", havingValue = "JSAPI")
     public WxPayService wxPayServiceJsapi() {
         validatePayConfig();
