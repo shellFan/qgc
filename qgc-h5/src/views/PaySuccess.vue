@@ -84,7 +84,7 @@ function goShare() {
 function onShareSelect(option) {
   const channel = option.name
   if (channel === '复制链接') {
-    navigator.clipboard?.writeText(window.location.origin + '/campaign/' + campaignId.value)
+    navigator.clipboard?.writeText(window.location.origin + '/h5/campaign/' + campaignId.value)
     showToast('链接已复制')
   }
   recordShare({

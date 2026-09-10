@@ -57,3 +57,69 @@ export const handleRiskRecord = (id) => request.post(`/admin/api/risk/record/${i
 export const reconcileWallet = () => request.get('/admin/api/reconcile/wallet')
 export const reconcileCampaign = () => request.get('/admin/api/reconcile/campaign')
 export const reconcilePayment = () => request.get('/admin/api/reconcile/payment')
+
+// ====== 分类管理 ======
+export const getCategoryList = (params) => request.get('/admin/api/categories', { params })
+export const getCategoryDetail = (id) => request.get(`/admin/api/categories/${id}`)
+export const createCategory = (data) => request.post('/admin/api/categories', data)
+export const updateCategory = (id, data) => request.put(`/admin/api/categories/${id}`, data)
+export const toggleCategory = (id) => request.put(`/admin/api/categories/${id}/toggle`)
+
+// ====== 支付/支持订单 ======
+export const getPaymentList = (params) => request.get('/admin/api/payments', { params })
+export const getPaymentDetail = (id) => request.get(`/admin/api/payments/${id}`)
+export const refundPayment = (id, data) => request.post(`/admin/api/payments/${id}/refund`, data)
+
+// ====== 钱包流水 ======
+export const getWalletFlowList = (params) => request.get('/admin/api/wallet/flows', { params })
+
+// ====== 返图管理 ======
+export const getProofList = (params) => request.get('/admin/api/proofs', { params })
+export const deleteProof = (id) => request.delete(`/admin/api/proofs/${id}`)
+
+// ====== 评论管理 ======
+export const getCommentList = (params) => request.get('/admin/api/comments', { params })
+export const updateCommentStatus = (id, data) => request.put(`/admin/api/comments/${id}/status`, data)
+
+// ====== 敏感词管理 ======
+export const getSensitiveWordList = (params) => request.get('/admin/api/sensitive-words', { params })
+export const createSensitiveWord = (data) => request.post('/admin/api/sensitive-words', data)
+export const updateSensitiveWord = (id, data) => request.put(`/admin/api/sensitive-words/${id}`, data)
+export const deleteSensitiveWord = (id) => request.delete(`/admin/api/sensitive-words/${id}`)
+export const importSensitiveWords = (data) => request.post('/admin/api/sensitive-words/import', data)
+
+// ====== 分享模板 ======
+export const getShareTemplateList = (params) => request.get('/admin/api/share-templates', { params })
+export const updateShareTemplate = (id, data) => request.put(`/admin/api/share-templates/${id}`, data)
+
+// ====== 随机留言 ======
+export const getRandomMessageList = (params) => request.get('/admin/api/random-messages', { params })
+export const createRandomMessage = (data) => request.post('/admin/api/random-messages', data)
+export const updateRandomMessage = (id, data) => request.put(`/admin/api/random-messages/${id}`, data)
+export const deleteRandomMessage = (id) => request.delete(`/admin/api/random-messages/${id}`)
+export const importRandomMessages = (data) => request.post('/admin/api/random-messages/import', data)
+
+// ====== 系统配置 ======
+export const getSystemConfigByGroup = (group) => request.get('/admin/api/system-config', { params: { group } })
+export const updateSystemConfig = (data) => request.post('/admin/api/system-config', data)
+
+// ====== 管理员管理 ======
+export const getManagerList = (params) => request.get('/admin/api/managers', { params })
+export const getManagerDetail = (id) => request.get(`/admin/api/managers/${id}`)
+export const createManager = (data) => request.post('/admin/api/managers', data)
+export const updateManager = (id, data) => request.put(`/admin/api/managers/${id}`, data)
+export const resetManagerPassword = (id, data) => request.put(`/admin/api/managers/${id}/password`, data)
+export const toggleManager = (id) => request.put(`/admin/api/managers/${id}/toggle`)
+
+// ====== 角色管理 ======
+export const getRoleList = () => request.get('/admin/api/roles')
+export const getRoleDetail = (id) => request.get(`/admin/api/roles/${id}`)
+export const updateRole = (id, data) => request.put(`/admin/api/roles/${id}`, data)
+
+// ====== 审计日志 ======
+export const getAuditLogList = (params) => request.get('/admin/api/audit-logs', { params })
+export const getAuditLogDetail = (id) => request.get(`/admin/api/audit-logs/${id}`)
+
+// ====== 举报管理 ======
+export const getReportList = (params) => request.get('/admin/api/reports', { params })
+export const handleReportAdmin = (id, data) => request.post(`/admin/api/reports/${id}`, data)

@@ -41,6 +41,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -67,7 +68,7 @@ public class PaymentServiceImpl implements PaymentService {
     private final QgcWxPayConfig qgcWxPayConfig;
     private final ApplicationEventPublisher eventPublisher;
     private final WalletService walletService;
-    private final PaymentProvider paymentProvider;
+    private final List<PaymentProvider> paymentProviders;
 
     /**
      * 发起支付
@@ -191,7 +192,7 @@ public class PaymentServiceImpl implements PaymentService {
                 result.setMock(true);
             } else {
                 // 真实支付: 调用PaymentProvider
-                PaymentResult providerResult = paymentProvider.createPayment(paymentOrder, openid);
+                PaymentResult providerResult = providerFor(payType).createPayment(paymentOrder, openid);
 
                 if (PayType.NATIVE.name().equals(payType)) {
                     // Native支付: 保存codeUrl和过期时间
@@ -280,7 +281,7 @@ public class PaymentServiceImpl implements PaymentService {
 
         try {
             // 使用PaymentProvider解析通知
-            NotifyResult notifyResult = paymentProvider.handlePayNotify(notifyData);
+            NotifyResult notifyResult = defaultProvider().handlePayNotify(notifyData);
 
             if (!"SUCCESS".equals(notifyResult.getResult())) {
                 notifyLog.setProcessResult("FAIL");
@@ -387,7 +388,7 @@ public class PaymentServiceImpl implements PaymentService {
         notifyLog.setRawData(notifyData.length() > 10000 ? notifyData.substring(0, 10000) : notifyData);
 
         try {
-            NotifyResult notifyResult = paymentProvider.handleRefundNotify(notifyData);
+            NotifyResult notifyResult = defaultProvider().handleRefundNotify(notifyData);
 
             if (!"SUCCESS".equals(notifyResult.getResult())) {
                 notifyLog.setProcessResult("FAIL");
@@ -467,7 +468,7 @@ public class PaymentServiceImpl implements PaymentService {
             paymentOrderMapper.updateById(paymentOrder);
         } else {
             try {
-                paymentProvider.refund(
+                providerFor(paymentOrder.getPayType()).refund(
                         paymentOrder.getOrderNo(),
                         refundOrder.getRefundNo(),
                         refundAmount,
@@ -500,7 +501,7 @@ public class PaymentServiceImpl implements PaymentService {
         // 关闭微信订单
         if (!qgcWxPayConfig.isMockMode()) {
             try {
-                paymentProvider.closePayment(paymentOrder.getOrderNo());
+                providerFor(paymentOrder.getPayType()).closePayment(paymentOrder.getOrderNo());
             } catch (Exception e) {
                 log.warn("关闭微信订单失败: {}", paymentOrder.getOrderNo(), e);
             }
@@ -519,6 +520,18 @@ public class PaymentServiceImpl implements PaymentService {
             supportOrder.setStatus(SupportStatus.CLOSED.name());
             supportOrderMapper.updateById(supportOrder);
         }
+    }
+
+    private PaymentProvider providerFor(String payType) {
+        return paymentProviders.stream()
+                .filter(provider -> provider.getPayType().equals(payType))
+                .findFirst()
+                .orElseThrow(() -> new BusinessException(ErrorCode.PAYMENT_PARAMS_ERROR,
+                        "支付方式未启用: " + payType));
+    }
+
+    private PaymentProvider defaultProvider() {
+        return providerFor(qgcWxPayConfig.isMockMode() ? PayType.MOCK.name() : qgcWxPayConfig.getMode());
     }
 
     // ========== 内部方法 ==========

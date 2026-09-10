@@ -79,6 +79,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
+import { getReviewCampaigns, reviewCampaign as reviewCampaignApi, getReviewComments, reviewComment as reviewCommentApi, getReports, handleReport as handleReportApi } from '@/api'
 
 const activeTab = ref('campaign')
 const statusMap = { PENDING_REVIEW: '待审核', ACTIVE: '已通过', REJECTED: '已拒绝', SUCCESS: '已成功', CLOSED: '已关闭', EXPIRED: '已过期' }
@@ -93,41 +94,33 @@ const reports = ref([])
 
 async function fetchCampaigns() {
   try {
-    const res = await fetch(`/admin/review/campaigns?page=${campaignPage.value}&size=20`).then(r => r.json())
+    const res = await getReviewCampaigns({ page: campaignPage.value, size: 20 })
     campaigns.value = res?.data?.records || res?.data || []
     campaignTotal.value = res?.data?.total || 0
-  } catch { /* ignore */ }
+  } catch { /* error handled */ }
 }
 
 async function fetchComments() {
   try {
-    const res = await fetch('/admin/review/comments?page=1&size=50').then(r => r.json())
+    const res = await getReviewComments({ page: 1, size: 50 })
     comments.value = res?.data?.records || res?.data || []
-  } catch { /* ignore */ }
+  } catch { /* error handled */ }
 }
 
 async function fetchReports() {
   try {
-    const res = await fetch('/admin/review/reports?page=1&size=50').then(r => r.json())
+    const res = await getReports({ page: 1, size: 50 })
     reports.value = res?.data?.records || res?.data || []
-  } catch { /* ignore */ }
+  } catch { /* error handled */ }
 }
 
 async function reviewCampaign(id, approved) {
   try {
     if (!approved) {
       const { value } = await ElMessageBox.prompt('请输入拒绝原因', '拒绝审核', { inputPlaceholder: '拒绝原因' })
-      await fetch(`/admin/review/campaign/${id}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ approved: false, rejectReason: value })
-      })
+      await reviewCampaignApi(id, { approved: false, rejectReason: value })
     } else {
-      await fetch(`/admin/review/campaign/${id}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ approved: true })
-      })
+      await reviewCampaignApi(id, { approved: true })
     }
     ElMessage.success(approved ? '已通过' : '已拒绝')
     fetchCampaigns()
@@ -136,11 +129,7 @@ async function reviewCampaign(id, approved) {
 
 async function reviewComment(id, status) {
   try {
-    await fetch(`/admin/review/comment/${id}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ status })
-    })
+    await reviewCommentApi(id, { status })
     ElMessage.success('操作成功')
     fetchComments()
   } catch { ElMessage.error('操作失败') }
@@ -149,7 +138,7 @@ async function reviewComment(id, status) {
 async function handleReport(id) {
   try {
     await ElMessageBox.confirm('确认处理此举报?', '提示', { type: 'warning' })
-    await fetch(`/admin/review/report/${id}`, { method: 'POST' })
+    await handleReportApi(id)
     ElMessage.success('已处理')
     fetchReports()
   } catch { /* cancel */ }

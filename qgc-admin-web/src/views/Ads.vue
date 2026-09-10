@@ -74,6 +74,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
+import { getAdList, createAd, updateAd, deleteAd as deleteAdApi, toggleAd as toggleAdApi } from '@/api'
 
 const positionMap = {
   HOME_TOP: '首页顶部',
@@ -93,9 +94,9 @@ const adForm = ref({ title: '', positionCode: 'HOME_TOP', imageUrl: '', linkUrl:
 
 async function fetchAds() {
   try {
-    const res = await fetch('/admin/ad/list').then(r => r.json())
+    const res = await getAdList()
     ads.value = res?.data || []
-  } catch { /* ignore */ }
+  } catch { /* error handled */ }
 }
 
 function editAd(row) {
@@ -118,9 +119,9 @@ async function saveAd() {
       enabled: adForm.value.enabled ? 1 : 0
     }
     if (editingAd.value) {
-      await fetch(`/admin/ad/${editingAd.value.id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
+      await updateAd(editingAd.value.id, payload)
     } else {
-      await fetch('/admin/ad', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
+      await createAd(payload)
     }
     ElMessage.success('保存成功')
     showAdd.value = false
@@ -131,7 +132,7 @@ async function saveAd() {
 
 async function toggleAd(row) {
   try {
-    await fetch(`/admin/ad/${row.id}/toggle`, { method: 'POST' })
+    await toggleAdApi(row.id)
     row.enabled = row.enabled === 1 ? 0 : 1
     ElMessage.success('状态已更新')
   } catch { ElMessage.error('操作失败') }
@@ -140,7 +141,7 @@ async function toggleAd(row) {
 async function deleteAd(row) {
   try {
     await ElMessageBox.confirm('确定删除此广告?', '提示', { type: 'warning' })
-    await fetch(`/admin/ad/${row.id}`, { method: 'DELETE' })
+    await deleteAdApi(row.id)
     ElMessage.success('已删除')
     fetchAds()
   } catch { /* cancel */ }

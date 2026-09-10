@@ -3,6 +3,10 @@ package com.qiongguichou.payment.config;
 import com.github.binarywang.wxpay.config.WxPayConfig;
 import com.github.binarywang.wxpay.service.WxPayService;
 import com.github.binarywang.wxpay.service.impl.WxPayServiceImpl;
+import com.github.binarywang.wxpay.v3.WxPayV3HttpClientBuilder;
+import com.github.binarywang.wxpay.v3.auth.WxPayValidator;
+import com.github.binarywang.wxpay.v3.util.PemUtils;
+import org.apache.http.impl.client.CloseableHttpClient;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -10,6 +14,11 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.security.PrivateKey;
 
 /**
  * 微信支付配置 - 支持MOCK/NATIVE/JSAPI三种模式
@@ -65,6 +74,12 @@ public class QgcWxPayConfig {
 
     /** 商户API证书文件路径(apiclient_cert.pem, 退款需要) */
     private String certPath;
+
+    /** 微信支付公钥文件路径(APIv3响应验签) */
+    private String platformPublicKeyPath;
+
+    /** 微信支付公钥ID(APIv3响应验签) */
+    private String platformPublicKeyId;
 
     /** 支付回调地址 */
     private String notifyUrl;
@@ -145,10 +160,34 @@ public class QgcWxPayConfig {
         payConfig.setNotifyUrl(notifyUrl);
         payConfig.setKeyPath(keyPath);
         payConfig.setTradeType(tradeType);
+        configurePlatformPublicKey(payConfig);
         WxPayService wxPayService = new WxPayServiceImpl();
         wxPayService.setConfig(payConfig);
         log.info("WxPayService初始化完成: mode={}, tradeType={}, mchId={}", mode, tradeType, mchId);
         return wxPayService;
+    }
+
+    private void configurePlatformPublicKey(WxPayConfig payConfig) {
+        if (platformPublicKeyPath == null || platformPublicKeyPath.trim().isEmpty()) {
+            return;
+        }
+        try {
+            PrivateKey privateKey;
+            try (java.io.InputStream input = Files.newInputStream(Paths.get(privateKeyPath))) {
+                privateKey = PemUtils.loadPrivateKey(input);
+            }
+            WxPayPublicKeyVerifier verifier = new WxPayPublicKeyVerifier(platformPublicKeyId, platformPublicKeyPath);
+            CloseableHttpClient httpClient = WxPayV3HttpClientBuilder.create()
+                .withMerchant(mchId, certificateSerialNo, privateKey)
+                .withValidator(new WxPayValidator(verifier))
+                .build();
+            payConfig.setPrivateKey(privateKey);
+            payConfig.setVerifier(verifier);
+            payConfig.setApiV3HttpClient(httpClient);
+            log.info("微信支付公钥验签已启用: path={}, publicKeyId={}", platformPublicKeyPath, platformPublicKeyId);
+        } catch (IOException e) {
+            throw new IllegalStateException("无法读取商户API私钥: " + privateKeyPath, e);
+        }
     }
 
     /**
@@ -165,6 +204,11 @@ public class QgcWxPayConfig {
         if (privateKeyPath == null || privateKeyPath.isEmpty()) missing.append(" QGC_PAY_PRIVATE_KEY_PATH(qgc.pay.private-key-path)");
         if (certificateSerialNo == null || certificateSerialNo.isEmpty()) missing.append(" QGC_PAY_CERTIFICATE_SERIAL_NO(qgc.pay.certificate-serial-no)");
         if (notifyUrl == null || notifyUrl.isEmpty()) missing.append(" QGC_PAY_NOTIFY_URL(qgc.pay.notify-url)");
+
+        if (platformPublicKeyPath != null && !platformPublicKeyPath.isEmpty()
+            && (platformPublicKeyId == null || platformPublicKeyId.isEmpty())) {
+            missing.append(" WX_PAY_PLATFORM_PUBLIC_KEY_ID(qgc.pay.platform-public-key-id)");
+        }
 
         // JSAPI模式额外需要appId
         if (isJsapiMode()) {

@@ -19,7 +19,6 @@ import com.qiongguichou.payment.provider.PaymentProvider;
 import com.qiongguichou.payment.provider.PaymentResult;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 /**
@@ -30,7 +29,6 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-@ConditionalOnProperty(name = "qgc.pay.mode", havingValue = "JSAPI")
 public class JsapiWechatPaymentProvider implements PaymentProvider {
 
     private final WxPayService wxPayService;

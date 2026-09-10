@@ -67,6 +67,19 @@ qgc:
     path: ${QGC_UPLOAD_PATH:./uploads/}
     max-size: 5242880  # 5MB
 
+  # 文件存储：生产可切换到 Mall 服务器上的 MinIO，默认仍使用本地目录
+  storage:
+    type: ${QGC_STORAGE_TYPE:local}
+    local:
+      path: ${QGC_UPLOAD_PATH:./uploads/}
+      url-prefix: ${QGC_UPLOAD_URL_PREFIX:/uploads}
+    minio:
+      endpoint: ${QGC_MINIO_ENDPOINT:}
+      access-key: ${QGC_MINIO_ACCESS_KEY:}
+      secret-key: ${QGC_MINIO_SECRET_KEY:}
+      bucket: ${QGC_MINIO_BUCKET:mall-public}
+      external-url: ${QGC_MINIO_EXTERNAL_URL:}
+
   # 微信配置
   wechat:
     mock-enabled: ${QGC_WECHAT_MOCK:true}  # 生产环境必须设为false
@@ -91,6 +104,8 @@ qgc:
     privateKeyPath: ${WX_PAY_PRIVATE_KEY_PATH:}
     certificateSerialNo: ${WX_PAY_CERTIFICATE_SERIAL_NO:}
     certPath: ${WX_PAY_CERT_PATH:}
+    platformPublicKeyPath: ${WX_PAY_PLATFORM_PUBLIC_KEY_PATH:}
+    platformPublicKeyId: ${WX_PAY_PLATFORM_PUBLIC_KEY_ID:}
     notifyUrl: ${WX_PAY_NOTIFY_URL:http://localhost:8080/api/payment/notify/pay}
     refundNotifyUrl: ${WX_PAY_REFUND_NOTIFY_URL:}
 

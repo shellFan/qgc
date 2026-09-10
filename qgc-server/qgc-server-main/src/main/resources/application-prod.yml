@@ -1,54 +1,27 @@
-# 生产环境配置
-# 生产环境严禁开启Mock模式
-
-spring:
-  datasource:
-    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3306/qiongguichou?useUnicode=true&characterEncoding=utf8mb4&useSSL=true&serverTimezone=Asia/Shanghai}
-    username: ${SPRING_DATASOURCE_USERNAME:root}
-    password: ${SPRING_DATASOURCE_PASSWORD:root}
-  redis:
-    host: ${SPRING_REDIS_HOST:localhost}
-    port: ${SPRING_REDIS_PORT:6379}
-    password: ${SPRING_REDIS_PASSWORD:}
-
-# CORS - 生产环境必须配置具体域名
-cors:
-  allowed-origins: ${CORS_ALLOWED_ORIGINS:}
+# 生产环境配置 - 覆盖开发默认值
+# 激活方式: --spring.profiles.active=prod
 
 qgc:
-  jwt:
-    secret: ${JWT_SECRET}  # 生产环境必须设置，无默认值
   auth:
-    mock-enabled: false  # 生产环境禁止Mock登录
+    mock-enabled: false
   wechat:
-    mock-enabled: false  # 生产环境禁止Mock微信
-    callback-base-url: ${QGC_WECHAT_CALLBACK_BASE_URL}
-    allowed-domains: ${QGC_WECHAT_ALLOWED_DOMAINS}
-    mp:
-      appId: ${WX_MP_APPID}
-      secret: ${WX_MP_SECRET}
-      token: ${WX_MP_TOKEN}
-      aesKey: ${WX_MP_AES_KEY}
+    mock-enabled: false
   pay:
-    mode: ${QGC_PAY_MODE:NATIVE}  # 生产环境默认Native扫码支付
-    merchant-mode: ${QGC_PAY_MERCHANT_MODE:DIRECT}
-    native-expire-minutes: ${QGC_PAY_NATIVE_EXPIRE_MINUTES:5}
-    mock-enabled: false  # 生产环境禁止Mock支付
-    appId: ${WX_PAY_APPID:}  # Native模式不强制需要appId
-    mchId: ${WX_PAY_MCH_ID}
-    mchKey: ${WX_PAY_MCH_KEY}
-    apiV3Key: ${WX_PAY_API_V3_KEY}
-    privateKeyPath: ${WX_PAY_PRIVATE_KEY_PATH}
-    certificateSerialNo: ${WX_PAY_CERTIFICATE_SERIAL_NO}
-    certPath: ${WX_PAY_CERT_PATH}
-    notifyUrl: ${WX_PAY_NOTIFY_URL}
-    refundNotifyUrl: ${WX_PAY_REFUND_NOTIFY_URL}
+    mock-enabled: false
+    platform-public-key-path: ${WX_PAY_PLATFORM_PUBLIC_KEY_PATH:}
+    platform-public-key-id: ${WX_PAY_PLATFORM_PUBLIC_KEY_ID:}
 
+# 生产日志级别
+logging:
+  level:
+    com.qiongguichou: info
+
+# 生产环境禁用SQL输出
 mybatis-plus:
   configuration:
     log-impl: org.apache.ibatis.logging.nologging.NoLoggingImpl
 
-logging:
-  level:
-    com.qiongguichou: info
-    com.baomidou.mybatisplus: warn
+# 生产环境禁用Swagger
+springfox:
+  documentation:
+    enabled: false

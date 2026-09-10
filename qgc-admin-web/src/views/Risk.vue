@@ -62,6 +62,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
+import { getRiskConfig, updateRiskConfig, getRiskRecords, handleRiskRecord } from '@/api'
 
 const rateLimits = ref([])
 const records = ref([])
@@ -78,7 +79,7 @@ const nameMap = {
 
 async function fetchConfig() {
   try {
-    const res = await fetch('/admin/risk/config').then(r => r.json())
+    const res = await getRiskConfig()
     const data = res?.data || {}
     rateLimits.value = Object.entries(data).map(([key, val]) => ({
       key,
@@ -86,14 +87,14 @@ async function fetchConfig() {
       maxCount: val.maxCount || val.split('/')[0] || 10,
       timeWindow: val.timeWindow || val.split('/')[1] || 60
     }))
-  } catch { /* ignore */ }
+  } catch { /* error handled */ }
 }
 
 async function fetchRecords() {
   try {
-    const res = await fetch('/admin/risk/records?page=1&size=50').then(r => r.json())
+    const res = await getRiskRecords({ page: 1, size: 50 })
     records.value = res?.data?.records || res?.data || []
-  } catch { /* ignore */ }
+  } catch { /* error handled */ }
 }
 
 function editLimit(row) {
@@ -103,11 +104,7 @@ function editLimit(row) {
 
 async function saveLimit() {
   try {
-    await fetch('/admin/risk/config', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ key: limitForm.value.key, maxCount: limitForm.value.maxCount, timeWindow: limitForm.value.timeWindow })
-    })
+    await updateRiskConfig({ key: limitForm.value.key, maxCount: limitForm.value.maxCount, timeWindow: limitForm.value.timeWindow })
     ElMessage.success('保存成功')
     showEdit.value = false
     fetchConfig()
@@ -116,7 +113,7 @@ async function saveLimit() {
 
 async function handleRecord(id) {
   try {
-    await fetch(`/admin/risk/record/${id}`, { method: 'POST' })
+    await handleRiskRecord(id)
     ElMessage.success('已处理')
     fetchRecords()
   } catch { ElMessage.error('操作失败') }

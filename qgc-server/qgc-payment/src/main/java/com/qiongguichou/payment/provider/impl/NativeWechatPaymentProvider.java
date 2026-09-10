@@ -9,6 +9,7 @@ import com.github.binarywang.wxpay.bean.result.WxPayRefundV3Result;
 import com.github.binarywang.wxpay.bean.result.enums.TradeTypeEnum;
 import com.github.binarywang.wxpay.service.WxPayService;
 import com.github.binarywang.wxpay.bean.result.WxPayOrderQueryV3Result;
+import com.github.binarywang.wxpay.bean.result.WxPayUnifiedOrderV3Result;
 import com.qiongguichou.common.enums.PayType;
 import com.qiongguichou.common.exception.BusinessException;
 import com.qiongguichou.common.result.ErrorCode;
@@ -19,10 +20,9 @@ import com.qiongguichou.payment.provider.PaymentProvider;
 import com.qiongguichou.payment.provider.PaymentResult;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 
 /**
@@ -34,7 +34,6 @@ import java.time.format.DateTimeFormatter;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-@ConditionalOnProperty(name = "qgc.pay.mode", havingValue = "NATIVE")
 public class NativeWechatPaymentProvider implements PaymentProvider {
 
     private final WxPayService wxPayService;
@@ -55,21 +54,36 @@ public class NativeWechatPaymentProvider implements PaymentProvider {
             // 设置过期时间(5分钟)
             int expireMinutes = qgcWxPayConfig.getNativeExpireMinutes() > 0
                     ? qgcWxPayConfig.getNativeExpireMinutes() : 5;
-            LocalDateTime expireTime = LocalDateTime.now().plusMinutes(expireMinutes);
-            request.setTimeExpire(expireTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssXXX")));
+            OffsetDateTime expireTime = OffsetDateTime.now().plusMinutes(expireMinutes);
+            request.setTimeExpire(expireTime.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
 
-            WxPayNativeOrderResult result = wxPayService.createOrderV3(TradeTypeEnum.NATIVE, request);
-            String codeUrl = result.getCodeUrl();
+            Object result = wxPayService.createOrderV3(TradeTypeEnum.NATIVE, request);
+            String codeUrl = extractCodeUrl(result);
 
             log.info("Native下单成功: orderNo={}, codeUrl={}", paymentOrder.getOrderNo(), codeUrl);
 
             return PaymentResult.nativePay(codeUrl,
-                    expireTime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+                    expireTime.toLocalDateTime().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
         } catch (Exception e) {
             log.error("Native下单失败: orderNo={}", paymentOrder.getOrderNo(), e);
             throw new BusinessException(ErrorCode.PAYMENT_CREATE_FAIL);
         }
     }
+
+    static String extractCodeUrl(Object result) {
+        if (result instanceof String) {
+            return (String) result;
+        }
+        if (result instanceof WxPayNativeOrderResult) {
+            return ((WxPayNativeOrderResult) result).getCodeUrl();
+        }
+        if (result instanceof WxPayUnifiedOrderV3Result) {
+            return ((WxPayUnifiedOrderV3Result) result).getCodeUrl();
+        }
+        throw new IllegalStateException("微信Native下单返回类型异常: "
+            + (result == null ? "null" : result.getClass().getName()));
+    }
+
 
     @Override
     public String queryPayment(String orderNo) {

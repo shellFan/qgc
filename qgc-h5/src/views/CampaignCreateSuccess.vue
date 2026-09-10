@@ -116,7 +116,7 @@ function goHome() {
 }
 
 async function copyLink() {
-  const url = window.location.origin + `/campaign/${campaign.value?.id || ''}`
+    const url = window.location.origin + `/h5/campaign/${campaign.value?.id || ''}`
   try {
     await navigator.clipboard.writeText(url)
     showSuccessToast('链接已复制')

@@ -5,9 +5,12 @@ import com.qiongguichou.common.result.ErrorCode;
 import com.qiongguichou.common.result.Result;
 import com.qiongguichou.core.config.RedisService;
 import com.qiongguichou.user.service.WechatAuthService;
+import com.qiongguichou.user.service.MiniProgramAuthService;
+import com.qiongguichou.user.dto.MiniProgramLoginRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
+import javax.validation.Valid;
 
 import java.security.SecureRandom;
 import java.util.Base64;
@@ -41,11 +44,20 @@ public class WechatAuthController {
     private String allowedDomains;
 
     private final WechatAuthService wechatAuthService;
+    private final MiniProgramAuthService miniProgramAuthService;
     private final RedisService redisService;
 
-    public WechatAuthController(WechatAuthService wechatAuthService, RedisService redisService) {
+    public WechatAuthController(WechatAuthService wechatAuthService, MiniProgramAuthService miniProgramAuthService,
+                                RedisService redisService) {
         this.wechatAuthService = wechatAuthService;
+        this.miniProgramAuthService = miniProgramAuthService;
         this.redisService = redisService;
+    }
+
+    @PostMapping("/miniapp/login")
+    public Result<Map<String, Object>> miniProgramLogin(@Valid @RequestBody MiniProgramLoginRequest request) {
+        return Result.success(miniProgramAuthService.login(
+                request.getCode(), request.getNickname(), request.getAvatar()));
     }
 
     /**

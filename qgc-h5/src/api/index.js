@@ -61,8 +61,16 @@ export const getRanking = (type) => request.get(`/api/ranking/${type}`)
 export const getRankingHistory = (type, params) => request.get(`/api/ranking/${type}/history`, { params })
 
 // ====== 分享 ======
-export const recordShare = (data) => request.post('/api/share', data)
-export const trackShareVisit = (shareCode, data) => request.post(`/api/share/visit/${shareCode}`, data)
+export const recordShare = (data) => {
+  const params = {
+    campaignId: data?.campaignId,
+    shareType: data?.shareType || data?.channel,
+    source: data?.source
+  }
+  return request.post('/api/share', null, { params })
+}
+export const trackShareVisit = (shareCode, data = {}) =>
+  request.post(`/api/share/visit/${shareCode}`, null, { params: data })
 export const getShareStats = (campaignId) => request.get(`/api/share/campaign/${campaignId}`)
 
 // ====== 用户等级/徽章/积分 ======

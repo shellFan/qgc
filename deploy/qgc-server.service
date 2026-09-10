@@ -15,27 +15,31 @@ LimitNOFILE=65536
 
 Environment=JWT_SECRET=qiongguichou2026prodSecretKey
 Environment=CORS_ALLOWED_ORIGINS=https://pay.21zuo.com
+EnvironmentFile=-/opt/qgc/minio.env
+Environment=QGC_STORAGE_TYPE=minio
 Environment=QGC_AUTH_MOCK=false
 Environment=QGC_WECHAT_MOCK=false
 Environment=QGC_WECHAT_CALLBACK_BASE_URL=https://pay.21zuo.com
 Environment=QGC_WECHAT_ALLOWED_DOMAINS=pay.21zuo.com
-Environment=WX_MP_APPID=wx_mock_appid
-Environment=WX_MP_SECRET=mock_secret
+Environment=WX_MP_APPID=wx134b5e9b72ccc822
+Environment=WX_MP_SECRET=
 Environment=WX_MP_TOKEN=mock_token
 Environment=WX_MP_AES_KEY=mock_aes_key
 Environment=QGC_PAY_MODE=NATIVE
 Environment=QGC_PAY_MERCHANT_MODE=DIRECT
 Environment=QGC_PAY_NATIVE_EXPIRE_MINUTES=5
 Environment=QGC_PAY_MOCK=false
-Environment=WX_PAY_APPID=
+Environment=WX_PAY_APPID=wx134b5e9b72ccc822
 Environment=WX_PAY_MCH_ID=1673666733
 Environment=WX_PAY_MCH_KEY=
 Environment=WX_PAY_API_V3_KEY=A7b9C2d4E6f8G1h3J5k7L9m2N4p6Q8r0
 Environment=WX_PAY_PRIVATE_KEY_PATH=/opt/qgc/cert/jnaapiclient_key.pem
-Environment=WX_PAY_CERTIFICATE_SERIAL_NO=PUB_KEY_ID_0116736667332026090800111956001001
+Environment=WX_PAY_CERTIFICATE_SERIAL_NO=658BDE4E4856D6A9E338278480FB2DC186F6AD58
 Environment=WX_PAY_CERT_PATH=/opt/qgc/cert/jnaapiclient_cert.p12
-Environment=WX_PAY_NOTIFY_URL=https://pay.21zuo.com/api/wechat/pay/notify
-Environment=WX_PAY_REFUND_NOTIFY_URL=https://pay.21zuo.com/api/wechat/refund/notify
+Environment=WX_PAY_PLATFORM_PUBLIC_KEY_PATH=/home/pub_key.pem
+Environment=WX_PAY_PLATFORM_PUBLIC_KEY_ID=PUB_KEY_ID_0116736667332026090800111956001001
+Environment=WX_PAY_NOTIFY_URL=https://pay.21zuo.com/api/payment/notify/pay
+Environment=WX_PAY_REFUND_NOTIFY_URL=https://pay.21zuo.com/api/payment/notify/refund
 
 [Install]
 WantedBy=multi-user.target
