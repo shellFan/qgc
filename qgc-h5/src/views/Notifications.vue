@@ -7,15 +7,23 @@
     </van-nav-bar>
 
     <van-list v-model:loading="loading" :finished="finished" finished-text="没有更多了" @load="loadMore">
-      <van-cell-group inset>
-        <van-cell v-for="item in list" :key="item.id" :class="{ unread: item.isRead === 0 }" :title="item.title" :label="item.content">
-          <template #value>
-            <span class="notif-time">{{ formatTime(item.createTime) }}</span>
-          </template>
-        </van-cell>
-      </van-cell-group>
-      <van-empty v-if="!loading && list.length === 0" description="暂无消息" />
+      <div class="notif-list">
+        <div v-for="item in list" :key="item.id" class="notif-card" :class="{ unread: item.isRead === 0 }" @click="goDetail(item)">
+          <div class="notif-dot" v-if="item.isRead === 0"></div>
+          <div class="notif-body">
+            <div class="notif-title">{{ item.title }}</div>
+            <div class="notif-content">{{ item.content }}</div>
+            <div class="notif-time">{{ formatTime(item.createTime) }}</div>
+          </div>
+        </div>
+      </div>
     </van-list>
+
+    <!-- 内联空状态 -->
+    <div v-if="!loading && list.length === 0" class="empty-state">
+      <div class="empty-emoji">🔔</div>
+      <div class="empty-text">暂无消息</div>
+    </div>
   </div>
 </template>
 
@@ -32,6 +40,11 @@ const page = ref(1)
 function formatTime(t) {
   if (!t) return ''
   return new Date(t).toLocaleDateString()
+}
+
+function goDetail(item) {
+  // Mark as read locally
+  if (item.isRead === 0) item.isRead = 1
 }
 
 async function loadMore() {
@@ -55,7 +68,81 @@ async function handleReadAll() {
 </script>
 
 <style scoped>
-.notif-page { min-height: 100vh; background: #f5f5f5; padding-bottom: 20px; }
-.unread { background: #fff8f0; }
-.notif-time { font-size: 11px; color: #999; }
+.notif-page {
+  min-height: 100dvh;
+  background: var(--qgc-bg);
+}
+
+.notif-list {
+  padding: var(--qgc-spacing-sm) var(--qgc-spacing-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--qgc-spacing-sm);
+}
+
+.notif-card {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--qgc-spacing-sm);
+  background: var(--qgc-bg-white);
+  border-radius: var(--qgc-radius-md);
+  padding: var(--qgc-spacing-lg);
+  box-shadow: var(--qgc-shadow-sm);
+  position: relative;
+  transition: background 0.15s;
+}
+.notif-card.unread {
+  background: var(--qgc-primary-light);
+}
+.notif-card:active {
+  background: var(--qgc-bg-grey);
+}
+
+.notif-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--qgc-danger);
+  flex-shrink: 0;
+  margin-top: 6px;
+}
+
+.notif-body {
+  flex: 1;
+  min-width: 0;
+}
+.notif-title {
+  font-size: var(--qgc-font-md);
+  font-weight: 600;
+  color: var(--qgc-text-primary);
+  line-height: 1.4;
+}
+.notif-content {
+  font-size: var(--qgc-font-sm);
+  color: var(--qgc-text-secondary);
+  margin-top: 4px;
+  line-height: 1.4;
+}
+.notif-time {
+  font-size: var(--qgc-font-xs);
+  color: var(--qgc-text-tertiary);
+  margin-top: 6px;
+}
+
+/* 内联空状态 */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 0 40px;
+}
+.empty-emoji {
+  font-size: 48px;
+  margin-bottom: var(--qgc-spacing-md);
+}
+.empty-text {
+  font-size: var(--qgc-font-md);
+  color: var(--qgc-text-tertiary);
+}
 </style>

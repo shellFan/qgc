@@ -6,8 +6,11 @@
       <!-- 封面图 -->
       <div class="cover-section">
         <img v-if="campaign.cover" :src="campaign.cover" class="detail-cover" />
+        <div v-else class="cover-placeholder">
+          <span class="cover-emoji">{{ campaign.categoryIcon || '🎯' }}</span>
+        </div>
         <div class="cover-status">
-          <van-tag :type="statusType(campaign.status)" size="medium">{{ statusText(campaign.status) }}</van-tag>
+          <van-tag :type="statusType(campaign.status)" size="medium" round>{{ statusText(campaign.status) }}</van-tag>
         </div>
       </div>
 
@@ -16,8 +19,8 @@
         <h2 class="detail-title">{{ campaign.title }}</h2>
         <div class="detail-creator">
           <img :src="campaign.creatorAvatar || defaultAvatar" class="creator-avatar" />
-          <span>{{ campaign.creatorNickname || '穷鬼' }}</span>
-          <span v-if="campaign.categoryName" class="creator-category">{{ campaign.categoryName }}</span>
+          <span class="creator-name">{{ campaign.creatorNickname || '穷鬼' }}</span>
+          <van-tag v-if="campaign.categoryName" type="primary" size="small" round class="creator-category">{{ campaign.categoryName }}</van-tag>
         </div>
 
         <!-- 进度 -->
@@ -26,12 +29,12 @@
             <span class="raised">{{ formatMoney(campaign.raisedAmount) }}</span>
             <span class="target">目标 {{ formatMoney(campaign.targetAmount) }}</span>
           </div>
-          <van-progress :percentage="progressPercent" :show-pivot="false" color="#ff4500" track-color="#ffe0d0" stroke-width="10" />
+          <van-progress :percentage="progressPercent" :show-pivot="false" color="var(--qgc-primary)" track-color="var(--qgc-primary-light)" stroke-width="8" />
           <div class="progress-info">
             <span>{{ campaign.supportCount }}人支持</span>
             <span>{{ campaign.viewCount }}次浏览</span>
             <span v-if="campaign.endTime">
-              <van-count-down v-if="getRemainingTime(campaign.endTime) > 0" :time="getRemainingTime(campaign.endTime)" format="剩余DD天HH时mm分" />
+              <van-count-down v-if="getRemainingTime(campaign.endTime) > 0" :time="getRemainingTime(campaign.endTime)" format="剩余DD天HH时mm分" class="countdown" />
               <span v-else class="expired-text">已截止</span>
             </span>
           </div>
@@ -46,7 +49,7 @@
 
       <!-- 详情 -->
       <div class="detail-card">
-        <h3>项目详情</h3>
+        <h3 class="card-heading">项目详情</h3>
         <p class="detail-desc">{{ campaign.description }}</p>
         <div v-if="campaign.images && campaign.images.length" class="detail-images">
           <img v-for="(img, idx) in campaign.images" :key="idx" :src="img" class="detail-img" />
@@ -55,8 +58,11 @@
 
       <!-- 支持者 -->
       <div class="detail-card">
-        <h3>支持者 <span class="count-badge">{{ supporters.length }}</span></h3>
-        <van-empty v-if="supporters.length === 0" description="暂无支持者，快来做第一个义父" :image-size="60" />
+        <h3 class="card-heading">支持者 <span class="count-badge">{{ supporters.length }}</span></h3>
+        <div v-if="supporters.length === 0" class="empty-inline">
+          <span class="empty-emoji">🤝</span>
+          <span class="empty-text">暂无支持者，快来做第一个义父</span>
+        </div>
         <div v-else class="supporter-list">
           <div v-for="s in supporters" :key="s.id" class="supporter-item">
             <img :src="s.supporterAvatar || defaultAvatar" class="supporter-avatar" />
@@ -71,23 +77,26 @@
 
       <!-- 返图 -->
       <div class="detail-card" v-if="campaign.proofStatus === 1">
-        <h3>返图</h3>
+        <h3 class="card-heading">返图</h3>
         <div v-for="p in proofs" :key="p.id" class="proof-item">
-          <h4>{{ p.title }}</h4>
-          <p>{{ p.content }}</p>
+          <h4 class="proof-title">{{ p.title }}</h4>
+          <p class="proof-content">{{ p.content }}</p>
           <div class="proof-images" v-if="p.images && p.images.length">
             <img v-for="(img, idx) in p.images" :key="idx" :src="img.imageUrl" class="proof-img" />
           </div>
           <div class="proof-actions">
-            <span @click="toggleLike(p)">{{ p.liked ? '❤️' : '🤍' }} {{ p.likeCount }}</span>
+            <span @click="toggleLike(p)" class="like-btn">{{ p.liked ? '❤️' : '🤍' }} {{ p.likeCount }}</span>
           </div>
         </div>
       </div>
 
       <!-- 评论 -->
       <div class="detail-card">
-        <h3>评论 <span class="count-badge">{{ comments.length }}</span></h3>
-        <van-empty v-if="comments.length === 0" description="暂无评论" :image-size="60" />
+        <h3 class="card-heading">评论 <span class="count-badge">{{ comments.length }}</span></h3>
+        <div v-if="comments.length === 0" class="empty-inline">
+          <span class="empty-emoji">💬</span>
+          <span class="empty-text">暂无评论</span>
+        </div>
         <div v-else class="comment-list">
           <div v-for="c in comments" :key="c.id" class="comment-item">
             <span class="comment-content">{{ c.content }}</span>
@@ -103,6 +112,11 @@
       </div>
     </div>
 
+    <!-- 加载骨架 -->
+    <div v-else class="loading-skeleton">
+      <van-skeleton title :row="8" />
+    </div>
+
     <!-- 底部操作栏 -->
     <div class="bottom-bar">
       <div class="bar-actions">
@@ -110,8 +124,12 @@
           <van-icon name="share-o" size="20" />
           <span>分享</span>
         </div>
+        <div class="bar-action" @click="goHome">
+          <van-icon name="home-o" size="20" />
+          <span>首页</span>
+        </div>
       </div>
-      <van-button type="danger" round class="support-btn" @click="goPay" :disabled="campaign.status !== 'ACTIVE'">
+      <van-button type="primary" round class="support-btn" @click="goPay" :disabled="campaign.status !== 'ACTIVE'">
         💰 投喂穷鬼
       </van-button>
     </div>
@@ -233,6 +251,10 @@ function goPay() {
   router.push({ path: '/pay', query: { campaignId: route.params.id } })
 }
 
+function goHome() {
+  router.push('/')
+}
+
 function handleShare() {
   showShare.value = true
 }
@@ -255,54 +277,296 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.detail-page { padding-bottom: 70px; }
+.detail-page {
+  min-height: 100dvh;
+  background: var(--qgc-bg);
+  padding-bottom: calc(60px + var(--qgc-safe-bottom));
+}
+
+/* 封面 */
 .cover-section { position: relative; }
-.detail-cover { width: 100%; max-height: 240px; object-fit: cover; }
-.cover-status { position: absolute; top: 10px; right: 10px; }
-.detail-card { background: #fff; margin: 10px 12px; border-radius: 12px; padding: 14px; }
-.detail-title { font-size: 18px; font-weight: 600; line-height: 1.4; }
-.detail-creator { display: flex; align-items: center; gap: 8px; margin-top: 8px; font-size: 13px; color: #666; }
-.creator-avatar { width: 24px; height: 24px; border-radius: 50%; }
-.creator-category { background: #fff0e6; color: #ff4500; font-size: 10px; padding: 1px 6px; border-radius: 4px; }
-.progress-section { margin-top: 14px; }
-.progress-amount { display: flex; justify-content: space-between; margin-bottom: 6px; }
-.raised { font-size: 20px; font-weight: bold; color: #ff4500; }
-.target { font-size: 13px; color: #999; align-self: flex-end; }
-.progress-info { display: flex; gap: 12px; margin-top: 6px; font-size: 12px; color: #999; }
-.expired-text { color: #ff4500; font-weight: 500; }
+.detail-cover {
+  width: 100%;
+  max-height: 220px;
+  object-fit: cover;
+  display: block;
+}
+.cover-placeholder {
+  width: 100%;
+  height: 160px;
+  background: linear-gradient(135deg, var(--qgc-primary), var(--qgc-primary-dark));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.cover-emoji { font-size: 48px; }
+.cover-status {
+  position: absolute;
+  top: var(--qgc-spacing-md);
+  right: var(--qgc-spacing-md);
+}
+
+/* 卡片 */
+.detail-card {
+  background: var(--qgc-bg-white);
+  margin: var(--qgc-spacing-sm) var(--qgc-spacing-md);
+  border-radius: var(--qgc-radius-md);
+  padding: var(--qgc-spacing-lg);
+  box-shadow: var(--qgc-shadow-sm);
+}
+.card-heading {
+  font-size: var(--qgc-font-lg);
+  font-weight: 600;
+  color: var(--qgc-text-primary);
+  margin-bottom: var(--qgc-spacing-md);
+}
+.detail-title {
+  font-size: var(--qgc-font-xl);
+  font-weight: 700;
+  line-height: 1.4;
+  color: var(--qgc-text-primary);
+}
+
+/* 创建者 */
+.detail-creator {
+  display: flex;
+  align-items: center;
+  gap: var(--qgc-spacing-sm);
+  margin-top: var(--qgc-spacing-sm);
+  font-size: var(--qgc-font-sm);
+  color: var(--qgc-text-secondary);
+}
+.creator-avatar {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+}
+.creator-name { font-weight: 500; }
+.creator-category { margin-left: auto; }
+
+/* 进度 */
+.progress-section { margin-top: var(--qgc-spacing-md); }
+.progress-amount {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: var(--qgc-spacing-xs);
+}
+.raised {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--qgc-primary);
+}
+.target {
+  font-size: var(--qgc-font-xs);
+  color: var(--qgc-text-tertiary);
+}
+.progress-info {
+  display: flex;
+  gap: var(--qgc-spacing-md);
+  margin-top: var(--qgc-spacing-xs);
+  font-size: var(--qgc-font-xs);
+  color: var(--qgc-text-tertiary);
+}
+.countdown { font-size: var(--qgc-font-xs); color: var(--qgc-secondary); }
+.expired-text { color: var(--qgc-danger); font-weight: 500; }
 
 /* 搞笑文案 */
-.funny-card { display: flex; align-items: center; gap: 8px; background: #fff9e6; border: 1px solid #ffe0b2; }
+.funny-card {
+  display: flex;
+  align-items: center;
+  gap: var(--qgc-spacing-sm);
+  background: var(--qgc-secondary-light);
+  border: 1px solid var(--qgc-secondary-border);
+}
 .funny-icon { font-size: 20px; }
-.funny-text { font-size: 13px; color: #e65100; line-height: 1.4; }
+.funny-text {
+  font-size: var(--qgc-font-sm);
+  color: var(--qgc-secondary-dark);
+  line-height: 1.4;
+}
 
-.detail-desc { font-size: 14px; line-height: 1.6; color: #333; white-space: pre-wrap; }
-.detail-images { margin-top: 10px; }
-.detail-img { width: 100%; border-radius: 8px; margin-bottom: 8px; }
-.supporter-list { display: flex; flex-direction: column; gap: 10px; }
-.supporter-item { display: flex; align-items: center; gap: 8px; }
-.supporter-avatar { width: 32px; height: 32px; border-radius: 50%; }
-.supporter-info { flex: 1; }
-.supporter-name { font-size: 13px; }
-.supporter-msg { font-size: 12px; color: #999; display: block; }
-.supporter-amount { font-size: 14px; color: #ff4500; font-weight: 500; }
-.count-badge { font-size: 12px; color: #999; font-weight: normal; }
-.proof-item { padding: 10px 0; border-bottom: 1px solid #f0f0f0; }
-.proof-images { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
-.proof-img { width: 100px; height: 100px; border-radius: 6px; object-fit: cover; }
-.proof-actions { margin-top: 6px; font-size: 13px; color: #666; }
-.comment-item { padding: 8px 0; border-bottom: 1px solid #f0f0f0; }
-.comment-content { font-size: 14px; }
-.comment-time { font-size: 11px; color: #999; display: block; margin-top: 2px; }
+/* 详情 */
+.detail-desc {
+  font-size: var(--qgc-font-md);
+  line-height: 1.7;
+  color: var(--qgc-text-primary);
+  white-space: pre-wrap;
+}
+.detail-images { margin-top: var(--qgc-spacing-md); }
+.detail-img {
+  width: 100%;
+  border-radius: var(--qgc-radius-sm);
+  margin-bottom: var(--qgc-spacing-sm);
+}
+
+/* 支持者 */
+.supporter-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--qgc-spacing-sm);
+}
+.supporter-item {
+  display: flex;
+  align-items: center;
+  gap: var(--qgc-spacing-sm);
+}
+.supporter-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.supporter-info { flex: 1; min-width: 0; }
+.supporter-name {
+  font-size: var(--qgc-font-sm);
+  font-weight: 500;
+  color: var(--qgc-text-primary);
+}
+.supporter-msg {
+  font-size: var(--qgc-font-xs);
+  color: var(--qgc-text-tertiary);
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.supporter-amount {
+  font-size: var(--qgc-font-md);
+  color: var(--qgc-primary);
+  font-weight: 600;
+  flex-shrink: 0;
+}
+.count-badge {
+  font-size: var(--qgc-font-xs);
+  color: var(--qgc-text-tertiary);
+  font-weight: normal;
+}
+
+/* 返图 */
+.proof-item {
+  padding: var(--qgc-spacing-md) 0;
+  border-bottom: 1px solid var(--qgc-border-light);
+}
+.proof-item:last-child { border-bottom: none; }
+.proof-title {
+  font-size: var(--qgc-font-md);
+  font-weight: 600;
+  margin-bottom: var(--qgc-spacing-xs);
+}
+.proof-content {
+  font-size: var(--qgc-font-sm);
+  color: var(--qgc-text-secondary);
+  line-height: 1.5;
+}
+.proof-images {
+  display: flex;
+  gap: var(--qgc-spacing-xs);
+  flex-wrap: wrap;
+  margin-top: var(--qgc-spacing-sm);
+}
+.proof-img {
+  width: 100px;
+  height: 100px;
+  border-radius: var(--qgc-radius-sm);
+  object-fit: cover;
+}
+.proof-actions {
+  margin-top: var(--qgc-spacing-xs);
+  font-size: var(--qgc-font-sm);
+  color: var(--qgc-text-tertiary);
+}
+.like-btn { cursor: pointer; }
+
+/* 评论 */
+.comment-item {
+  padding: var(--qgc-spacing-sm) 0;
+  border-bottom: 1px solid var(--qgc-border-light);
+}
+.comment-item:last-child { border-bottom: none; }
+.comment-content {
+  font-size: var(--qgc-font-md);
+  color: var(--qgc-text-primary);
+}
+.comment-time {
+  font-size: var(--qgc-font-xs);
+  color: var(--qgc-text-tertiary);
+  display: block;
+  margin-top: 2px;
+}
+
+/* 空状态内联 */
+.empty-inline {
+  display: flex;
+  align-items: center;
+  gap: var(--qgc-spacing-sm);
+  padding: var(--qgc-spacing-md) 0;
+  color: var(--qgc-text-tertiary);
+}
+.empty-emoji { font-size: 24px; }
+.empty-text { font-size: var(--qgc-font-sm); }
 
 /* 广告 */
-.ad-inline { position: relative; margin: 10px 12px; border-radius: 8px; overflow: hidden; }
-.ad-inline-img { width: 100%; height: 80px; object-fit: cover; display: block; }
-.ad-tag { position: absolute; right: 8px; bottom: 8px; background: rgba(0,0,0,0.5); color: #fff; font-size: 10px; padding: 1px 6px; border-radius: 4px; }
+.ad-inline {
+  position: relative;
+  margin: var(--qgc-spacing-sm) var(--qgc-spacing-md);
+  border-radius: var(--qgc-radius-sm);
+  overflow: hidden;
+}
+.ad-inline-img {
+  width: 100%;
+  height: 80px;
+  object-fit: cover;
+  display: block;
+}
+.ad-tag {
+  position: absolute;
+  right: 8px;
+  bottom: 8px;
+  background: rgba(0,0,0,0.5);
+  color: #fff;
+  font-size: 10px;
+  padding: 1px 6px;
+  border-radius: 4px;
+}
+
+/* 加载骨架 */
+.loading-skeleton {
+  padding: var(--qgc-spacing-xl) var(--qgc-spacing-md);
+}
 
 /* 底部栏 */
-.bottom-bar { position: fixed; bottom: 0; left: 0; right: 0; padding: 10px 16px; background: #fff; box-shadow: 0 -1px 4px rgba(0,0,0,0.06); z-index: 99; display: flex; align-items: center; gap: 12px; }
-.bar-actions { display: flex; gap: 16px; }
-.bar-action { display: flex; flex-direction: column; align-items: center; font-size: 11px; color: #666; cursor: pointer; }
-.support-btn { flex: 1; }
+.bottom-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: var(--qgc-spacing-sm) var(--qgc-spacing-md);
+  padding-bottom: calc(var(--qgc-spacing-sm) + var(--qgc-safe-bottom));
+  background: var(--qgc-bg-white);
+  box-shadow: 0 -1px 4px rgba(0,0,0,0.06);
+  z-index: 99;
+  display: flex;
+  align-items: center;
+  gap: var(--qgc-spacing-md);
+}
+.bar-actions {
+  display: flex;
+  gap: var(--qgc-spacing-md);
+}
+.bar-action {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: var(--qgc-font-xs);
+  color: var(--qgc-text-tertiary);
+  cursor: pointer;
+  min-width: 40px;
+}
+.support-btn {
+  flex: 1;
+  height: 44px;
+  font-size: var(--qgc-font-md);
+  font-weight: 600;
+}
 </style>

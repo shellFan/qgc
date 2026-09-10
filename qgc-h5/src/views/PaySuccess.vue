@@ -5,7 +5,7 @@
     <div class="success-content">
       <div class="success-icon">🎉</div>
       <h2 class="success-title">投喂成功！</h2>
-      <p class="success-desc">你已成功投喂 {{ formatMoney(amount) }}，穷鬼感谢你的慷慨！</p>
+      <p class="success-desc">你已成功投喂 <strong class="amount-highlight">{{ formatMoney(amount) }}</strong>，穷鬼感谢你的慷慨！</p>
 
       <!-- 搞笑文案 -->
       <div v-if="funnyMessage" class="funny-box">
@@ -24,9 +24,9 @@
       </div>
 
       <div class="action-buttons">
-        <van-button round block type="danger" @click="goShare">分享给朋友</van-button>
-        <van-button round block plain @click="goDetail" style="margin-top: 12px">查看筹款详情</van-button>
-        <van-button round block plain @click="goHome" style="margin-top: 12px">返回首页</van-button>
+        <van-button round block type="primary" @click="goShare" class="action-btn">分享给朋友</van-button>
+        <van-button round block plain type="primary" @click="goDetail" class="action-btn">查看筹款详情</van-button>
+        <van-button round block plain @click="goHome" class="action-btn">返回首页</van-button>
       </div>
     </div>
 
@@ -38,7 +38,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { getRandomMessages } from '@/api'
+import { getRandomMessages, recordShare, getAdsByPosition } from '@/api'
 import { formatMoney } from '@/utils/money'
 import { showToast } from 'vant'
 
@@ -68,7 +68,7 @@ async function fetchFunnyMessage() {
 
 async function fetchAd() {
   try {
-    const res = await fetch('/api/ad/position/PAY_SUCCESS').then(r => r.json()).catch(() => null)
+    const res = await getAdsByPosition('PAY_SUCCESS')
     if (res?.data?.length) ad.value = res.data[0]
   } catch { /* ignore */ }
 }
@@ -82,10 +82,16 @@ function goShare() {
 }
 
 function onShareSelect(option) {
-  if (option.name === '复制链接') {
+  const channel = option.name
+  if (channel === '复制链接') {
     navigator.clipboard?.writeText(window.location.origin + '/campaign/' + campaignId.value)
     showToast('链接已复制')
   }
+  recordShare({
+    campaignId: campaignId.value,
+    channel: channel,
+    amount: amount.value
+  }).catch(() => {})
   showShare.value = false
 }
 
@@ -104,15 +110,79 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.pay-success-page { min-height: 100vh; background: #f5f5f5; }
-.success-content { padding: 40px 20px; text-align: center; }
-.success-icon { font-size: 64px; margin-bottom: 16px; }
-.success-title { font-size: 22px; font-weight: bold; color: #333; }
-.success-desc { font-size: 14px; color: #666; margin-top: 8px; }
-.funny-box { background: #fff9e6; border: 1px solid #ffe0b2; border-radius: 8px; padding: 12px; margin-top: 16px; font-size: 13px; color: #e65100; }
-.points-box { background: #e8f5e9; border: 1px solid #c8e6c9; border-radius: 8px; padding: 10px; margin-top: 12px; font-size: 14px; color: #2e7d32; font-weight: 500; }
-.ad-box { position: relative; margin-top: 16px; border-radius: 8px; overflow: hidden; }
-.ad-img { width: 100%; height: 80px; object-fit: cover; display: block; }
-.ad-tag { position: absolute; right: 8px; bottom: 8px; background: rgba(0,0,0,0.5); color: #fff; font-size: 10px; padding: 1px 6px; border-radius: 4px; }
-.action-buttons { margin-top: 24px; }
+.pay-success-page {
+  min-height: 100dvh;
+  background: var(--qgc-bg);
+}
+.success-content {
+  padding: var(--qgc-spacing-xxl) var(--qgc-spacing-lg);
+  text-align: center;
+}
+.success-icon {
+  font-size: 64px;
+  margin-bottom: var(--qgc-spacing-lg);
+}
+.success-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--qgc-primary);
+}
+.success-desc {
+  font-size: var(--qgc-font-md);
+  color: var(--qgc-text-secondary);
+  margin-top: var(--qgc-spacing-sm);
+  line-height: 1.6;
+}
+.amount-highlight {
+  color: var(--qgc-primary);
+  font-size: var(--qgc-font-lg);
+}
+.funny-box {
+  background: var(--qgc-secondary-light);
+  border: 1px solid var(--qgc-secondary-border);
+  border-radius: var(--qgc-radius-md);
+  padding: var(--qgc-spacing-md);
+  margin-top: var(--qgc-spacing-lg);
+  font-size: var(--qgc-font-sm);
+  color: var(--qgc-secondary-dark);
+  text-align: left;
+}
+.points-box {
+  background: var(--qgc-primary-light);
+  border: 1px solid var(--qgc-primary-border, rgba(45, 184, 75, 0.2));
+  border-radius: var(--qgc-radius-md);
+  padding: var(--qgc-spacing-md);
+  margin-top: var(--qgc-spacing-md);
+  font-size: var(--qgc-font-md);
+  color: var(--qgc-primary);
+  font-weight: 600;
+}
+.ad-box {
+  position: relative;
+  margin-top: var(--qgc-spacing-lg);
+  border-radius: var(--qgc-radius-sm);
+  overflow: hidden;
+}
+.ad-img {
+  width: 100%;
+  height: 80px;
+  object-fit: cover;
+  display: block;
+}
+.ad-tag {
+  position: absolute;
+  right: 8px;
+  bottom: 8px;
+  background: rgba(0,0,0,0.5);
+  color: #fff;
+  font-size: 10px;
+  padding: 1px 6px;
+  border-radius: 4px;
+}
+.action-buttons {
+  margin-top: var(--qgc-spacing-xxl);
+}
+.action-btn {
+  margin-top: var(--qgc-spacing-md);
+}
 </style>

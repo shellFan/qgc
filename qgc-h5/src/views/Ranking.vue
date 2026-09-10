@@ -14,7 +14,10 @@
             </div>
             <div class="rank-badge" v-if="idx < 3">{{ ['🥇','🥈','🥉'][idx] }}</div>
           </div>
-          <van-empty v-if="!loading && sadList.length === 0" description="今日暂无数据" />
+          <div v-if="!loading && sadList.length === 0" class="empty-state">
+            <span class="empty-emoji">📊</span>
+            <p>今日暂无数据</p>
+          </div>
         </div>
       </van-tab>
       <van-tab title="最多义父" name="MOST_SUPPORTERS">
@@ -28,7 +31,10 @@
             </div>
             <div class="rank-badge" v-if="idx < 3">{{ ['🥇','🥈','🥉'][idx] }}</div>
           </div>
-          <van-empty v-if="!loading && supporterList.length === 0" description="暂无数据" />
+          <div v-if="!loading && supporterList.length === 0" class="empty-state">
+            <span class="empty-emoji">📊</span>
+            <p>暂无数据</p>
+          </div>
         </div>
       </van-tab>
     </van-tabs>
@@ -36,8 +42,10 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { getRanking } from '@/api'
+import { showToast } from 'vant'
 
 const router = useRouter()
 const activeTab = ref('SADDEST_DAY')
@@ -50,16 +58,21 @@ const defaultAvatar = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg
 async function fetchRanking(type) {
   loading.value = true
   try {
-    const res = await fetch(`/api/ranking/${type}`).then(r => r.json())
+    const res = await getRanking({ type })
     const list = res?.data || []
     if (type === 'SADDEST_DAY') sadList.value = list
     else supporterList.value = list
-  } catch { /* ignore */ }
-  loading.value = false
+  } catch (e) {
+    showToast('获取排行榜失败')
+  } finally {
+    loading.value = false
+  }
 }
 
 function goDetail(item) {
-  // 排行榜项可能没有campaignId，暂不跳转
+  if (item.userId) {
+    router.push(`/profile/${item.userId}`)
+  }
 }
 
 onMounted(() => {
@@ -69,14 +82,85 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.ranking-page { min-height: 100vh; background: #f5f5f5; }
-.ranking-list { padding: 12px; }
-.rank-item { display: flex; align-items: center; gap: 12px; background: #fff; border-radius: 10px; padding: 12px; margin-bottom: 8px; }
-.rank-no { width: 28px; height: 28px; border-radius: 50%; background: #f0f0f0; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: bold; color: #999; flex-shrink: 0; }
-.rank-no.top3 { background: #fff0e6; color: #ff4500; }
-.rank-avatar { width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0; }
-.rank-info { flex: 1; min-width: 0; }
-.rank-name { font-size: 14px; font-weight: 500; display: block; }
-.rank-score { font-size: 12px; color: #999; display: block; margin-top: 2px; }
-.rank-badge { font-size: 20px; flex-shrink: 0; }
+.ranking-page {
+  min-height: 100dvh;
+  background: var(--qgc-bg);
+}
+.ranking-list {
+  padding: var(--qgc-spacing-sm);
+}
+.rank-item {
+  display: flex;
+  align-items: center;
+  gap: var(--qgc-spacing-md);
+  background: var(--qgc-bg-white);
+  border-radius: var(--qgc-radius-md);
+  padding: var(--qgc-spacing-md);
+  margin-bottom: var(--qgc-spacing-xs);
+  box-shadow: var(--qgc-shadow-sm);
+  transition: background 0.15s;
+}
+.rank-item:active {
+  background: var(--qgc-bg-grey);
+}
+.rank-no {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--qgc-bg-grey);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--qgc-font-md);
+  font-weight: 700;
+  color: var(--qgc-text-tertiary);
+  flex-shrink: 0;
+}
+.rank-no.top3 {
+  background: var(--qgc-secondary-light);
+  color: var(--qgc-secondary);
+}
+.rank-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.rank-info {
+  flex: 1;
+  min-width: 0;
+}
+.rank-name {
+  font-size: var(--qgc-font-md);
+  font-weight: 500;
+  display: block;
+  color: var(--qgc-text-primary);
+}
+.rank-score {
+  font-size: var(--qgc-font-xs);
+  color: var(--qgc-text-tertiary);
+  display: block;
+  margin-top: 2px;
+}
+.rank-badge {
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+/* 空状态 */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px 0;
+  color: var(--qgc-text-tertiary);
+}
+.empty-emoji {
+  font-size: 48px;
+  margin-bottom: var(--qgc-spacing-sm);
+}
+.empty-state p {
+  font-size: var(--qgc-font-md);
+  margin: 0;
+}
 </style>

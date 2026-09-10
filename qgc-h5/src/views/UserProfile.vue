@@ -2,34 +2,37 @@
   <div class="profile-page">
     <van-nav-bar left-arrow @click-left="$router.back()" :title="isMine ? '我的主页' : '用户主页'" fixed placeholder />
 
+    <!-- 用户头部 -->
     <div class="profile-header">
       <img :src="profile.avatar || defaultAvatar" class="profile-avatar" />
       <div class="profile-info">
         <h2 class="profile-name">{{ profile.nickname || '穷鬼' }}</h2>
         <div class="profile-level" v-if="levelInfo">
-          <van-tag type="warning" size="medium">Lv{{ levelInfo.level }} {{ levelInfo.title }}</van-tag>
+          <van-tag type="warning" size="medium" round>Lv{{ levelInfo.level }} {{ levelInfo.title }}</van-tag>
         </div>
         <div class="profile-joined" v-if="profile.createTime">加入于 {{ formatDate(profile.createTime) }}</div>
       </div>
     </div>
 
-    <!-- 积分/等级/徽章 统计 -->
+    <!-- 统计栏 -->
     <div class="stats-row" v-if="isMine">
       <div class="stat-item" @click="showPoints = true">
         <span class="stat-value">{{ pointsInfo.points || 0 }}</span>
         <span class="stat-label">积分</span>
       </div>
+      <div class="stat-divider"></div>
       <div class="stat-item">
         <span class="stat-value">{{ levelInfo?.level || 1 }}</span>
         <span class="stat-label">等级</span>
       </div>
+      <div class="stat-divider"></div>
       <div class="stat-item" @click="showBadges = true">
         <span class="stat-value">{{ badges.length }}</span>
         <span class="stat-label">徽章</span>
       </div>
     </div>
 
-    <!-- 徽章展示 -->
+    <!-- 徽章墙 -->
     <div class="section" v-if="badges.length > 0">
       <div class="section-header">
         <span class="section-title">🏅 徽章墙</span>
@@ -48,14 +51,12 @@
         <span class="section-title">📊 等级进度</span>
       </div>
       <div class="level-progress">
-        <div class="level-bar">
-          <van-progress :percentage="levelPercent" :show-pivot="false" color="#ff4500" track-color="#ffe0d0" stroke-width="12" />
-        </div>
+        <van-progress :percentage="levelPercent" :show-pivot="false" color="var(--qgc-primary)" track-color="var(--qgc-primary-light)" stroke-width="12" />
         <div class="level-text">{{ levelInfo.exp || 0 }} / {{ nextLevelExp }} 经验</div>
       </div>
     </div>
 
-    <!-- 积分流水 -->
+    <!-- 积分明细 -->
     <div class="section" v-if="isMine && showPoints">
       <div class="section-header">
         <span class="section-title">💰 积分明细</span>
@@ -66,7 +67,10 @@
           <span class="points-remark">{{ f.remark }}</span>
           <span class="points-amount" :class="{ positive: f.amount > 0 }">{{ f.amount > 0 ? '+' : '' }}{{ f.amount }}</span>
         </div>
-        <van-empty v-if="pointsFlow.length === 0" description="暂无积分记录" :image-size="60" />
+        <div v-if="pointsFlow.length === 0" class="empty-state">
+          <span class="empty-emoji">💰</span>
+          <p>暂无积分记录</p>
+        </div>
       </div>
     </div>
 
@@ -80,7 +84,10 @@
             <span class="badge-time">{{ formatDate(b.earnedTime) }}</span>
           </div>
         </div>
-        <van-empty v-if="badges.length === 0" description="暂无徽章" :image-size="60" />
+        <div v-if="badges.length === 0" class="empty-state">
+          <span class="empty-emoji">🏅</span>
+          <p>暂无徽章</p>
+        </div>
       </div>
     </van-dialog>
   </div>
@@ -89,6 +96,8 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
+import { showToast } from 'vant'
+import { getMyProfile, getUserProfile, getMyLevel, getMyBadges, getMyPoints, getMyPointsFlow } from '@/api'
 import { useUserStore } from '@/stores/user'
 
 const route = useRoute()
@@ -128,42 +137,39 @@ function formatDate(t) {
 
 async function fetchProfile() {
   try {
-    const url = isMine.value ? '/api/user/profile/mine' : `/api/user/profile/${userId.value}`
-    const res = await fetch(url).then(r => r.json())
+    const res = isMine.value ? await getMyProfile() : await getUserProfile(userId.value)
     profile.value = res?.data || {}
-  } catch { /* ignore */ }
+  } catch { showToast('获取用户信息失败') }
 }
 
 async function fetchLevel() {
   try {
-    const url = isMine.value ? '/api/user/profile/level' : `/api/user/profile/${userId.value}`
-    const res = await fetch(url).then(r => r.json())
+    const res = await getMyLevel()
     levelInfo.value = res?.data || null
-  } catch { /* ignore */ }
+  } catch { /* level is optional */ }
 }
 
 async function fetchBadges() {
   try {
-    const url = isMine.value ? '/api/user/profile/badges' : `/api/user/profile/${userId.value}`
-    const res = await fetch(url).then(r => r.json())
+    const res = await getMyBadges()
     badges.value = res?.data || []
-  } catch { /* ignore */ }
+  } catch { /* badges is optional */ }
 }
 
 async function fetchPoints() {
   if (!isMine.value) return
   try {
-    const res = await fetch('/api/user/profile/points').then(r => r.json())
+    const res = await getMyPoints()
     pointsInfo.value = res?.data || {}
-  } catch { /* ignore */ }
+  } catch { /* points is optional */ }
 }
 
 async function fetchPointsFlow() {
   if (!isMine.value) return
   try {
-    const res = await fetch('/api/user/profile/points/flow').then(r => r.json())
+    const res = await getMyPointsFlow()
     pointsFlow.value = res?.data?.records || res?.data || []
-  } catch { /* ignore */ }
+  } catch { /* points flow is optional */ }
 }
 
 onMounted(() => {
@@ -176,34 +182,200 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.profile-page { min-height: 100vh; background: #f5f5f5; }
-.profile-header { display: flex; align-items: center; gap: 14px; padding: 20px; background: #fff; }
-.profile-avatar { width: 64px; height: 64px; border-radius: 50%; }
-.profile-info { flex: 1; }
-.profile-name { font-size: 18px; font-weight: 600; margin: 0; }
-.profile-level { margin-top: 6px; }
-.profile-joined { font-size: 12px; color: #999; margin-top: 4px; }
-.stats-row { display: flex; background: #fff; padding: 14px 0; margin-top: 1px; border-top: 1px solid #f0f0f0; }
-.stat-item { flex: 1; text-align: center; cursor: pointer; }
-.stat-value { display: block; font-size: 18px; font-weight: bold; color: #ff4500; }
-.stat-label { display: block; font-size: 12px; color: #999; margin-top: 2px; }
-.section { margin: 10px 12px; background: #fff; border-radius: 12px; padding: 14px; }
-.section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-.section-title { font-size: 15px; font-weight: 600; }
-.section-close { font-size: 12px; color: #999; }
-.badge-grid { display: flex; flex-wrap: wrap; gap: 12px; }
-.badge-item { display: flex; flex-direction: column; align-items: center; min-width: 60px; }
-.badge-icon { font-size: 28px; }
-.badge-name { font-size: 11px; color: #666; margin-top: 2px; }
-.level-progress { margin-top: 4px; }
-.level-text { font-size: 12px; color: #999; margin-top: 6px; text-align: center; }
-.points-list { max-height: 300px; overflow-y: auto; }
-.points-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #f5f5f5; }
-.points-remark { font-size: 13px; color: #333; }
-.points-amount { font-size: 13px; font-weight: 500; color: #999; }
-.points-amount.positive { color: #ff4500; }
-.badge-dialog { padding: 16px; max-height: 400px; overflow-y: auto; }
-.badge-dialog-item { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid #f5f5f5; }
-.badge-dialog-info { flex: 1; }
-.badge-time { font-size: 11px; color: #999; display: block; }
+.profile-page {
+  min-height: 100dvh;
+  background: var(--qgc-bg);
+}
+
+/* 头部 */
+.profile-header {
+  display: flex;
+  align-items: center;
+  gap: var(--qgc-spacing-md);
+  padding: var(--qgc-spacing-lg) var(--qgc-spacing-md);
+  background: linear-gradient(135deg, var(--qgc-primary), var(--qgc-primary-dark));
+  color: #fff;
+}
+.profile-avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  flex-shrink: 0;
+}
+.profile-info {
+  flex: 1;
+  min-width: 0;
+}
+.profile-name {
+  font-size: var(--qgc-font-xl);
+  font-weight: 700;
+  margin: 0;
+  color: #fff;
+}
+.profile-level {
+  margin-top: 6px;
+}
+.profile-joined {
+  font-size: var(--qgc-font-xs);
+  color: rgba(255, 255, 255, 0.7);
+  margin-top: 4px;
+}
+
+/* 统计栏 */
+.stats-row {
+  display: flex;
+  align-items: center;
+  background: var(--qgc-bg-white);
+  padding: var(--qgc-spacing-md) 0;
+  box-shadow: var(--qgc-shadow-sm);
+}
+.stat-item {
+  flex: 1;
+  text-align: center;
+  cursor: pointer;
+}
+.stat-value {
+  display: block;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--qgc-primary);
+}
+.stat-label {
+  display: block;
+  font-size: var(--qgc-font-xs);
+  color: var(--qgc-text-tertiary);
+  margin-top: 2px;
+}
+.stat-divider {
+  width: 1px;
+  height: 24px;
+  background: var(--qgc-border-light);
+}
+
+/* 通用 section */
+.section {
+  margin: var(--qgc-spacing-sm) var(--qgc-spacing-md);
+  background: var(--qgc-bg-white);
+  border-radius: var(--qgc-radius-md);
+  padding: var(--qgc-spacing-lg);
+  box-shadow: var(--qgc-shadow-sm);
+}
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--qgc-spacing-md);
+}
+.section-title {
+  font-size: var(--qgc-font-md);
+  font-weight: 600;
+  color: var(--qgc-text-primary);
+}
+.section-close {
+  font-size: var(--qgc-font-xs);
+  color: var(--qgc-text-tertiary);
+  cursor: pointer;
+}
+
+/* 徽章 */
+.badge-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--qgc-spacing-md);
+}
+.badge-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 60px;
+}
+.badge-icon {
+  font-size: 28px;
+}
+.badge-name {
+  font-size: var(--qgc-font-xs);
+  color: var(--qgc-text-secondary);
+  margin-top: 2px;
+}
+
+/* 等级进度 */
+.level-progress {
+  margin-top: 4px;
+}
+.level-text {
+  font-size: var(--qgc-font-xs);
+  color: var(--qgc-text-tertiary);
+  margin-top: 6px;
+  text-align: center;
+}
+
+/* 积分列表 */
+.points-list {
+  max-height: 300px;
+  overflow-y: auto;
+}
+.points-item {
+  display: flex;
+  justify-content: space-between;
+  padding: var(--qgc-spacing-sm) 0;
+  border-bottom: 1px solid var(--qgc-border-light);
+}
+.points-item:last-child {
+  border-bottom: none;
+}
+.points-remark {
+  font-size: var(--qgc-font-md);
+  color: var(--qgc-text-primary);
+}
+.points-amount {
+  font-size: var(--qgc-font-md);
+  font-weight: 500;
+  color: var(--qgc-text-tertiary);
+}
+.points-amount.positive {
+  color: var(--qgc-primary);
+}
+
+/* 徽章弹窗 */
+.badge-dialog {
+  padding: var(--qgc-spacing-lg);
+  max-height: 400px;
+  overflow-y: auto;
+}
+.badge-dialog-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: var(--qgc-spacing-sm) 0;
+  border-bottom: 1px solid var(--qgc-border-light);
+}
+.badge-dialog-item:last-child {
+  border-bottom: none;
+}
+.badge-dialog-info {
+  flex: 1;
+}
+.badge-time {
+  font-size: var(--qgc-font-xs);
+  color: var(--qgc-text-tertiary);
+  display: block;
+}
+
+/* 空状态 */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 30px 0;
+  color: var(--qgc-text-tertiary);
+}
+.empty-emoji {
+  font-size: 48px;
+  margin-bottom: var(--qgc-spacing-sm);
+}
+.empty-state p {
+  font-size: var(--qgc-font-md);
+  margin: 0;
+}
 </style>

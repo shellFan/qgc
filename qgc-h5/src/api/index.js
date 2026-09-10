@@ -1,8 +1,7 @@
 import request from '@/utils/request'
 
 // ====== 认证 ======
-export const devLogin = (data) => request.post('/dev/login', data)
-export const devLoginByOpenid = (data) => request.post('/dev/login-by-openid', data)
+export const quickLogin = (data) => request.post('/api/user/quick-login', data)
 export const getAuthorizeUrl = (params) => request.get('/api/auth/authorize-url', { params })
 export const authCallback = (params) => request.get('/api/auth/callback', { params })
 export const getJsSdkConfig = (params) => request.get('/api/auth/jssdk-config', { params })
@@ -41,7 +40,7 @@ export const getFlowList = (params) => request.get('/api/wallet/flow/list', { pa
 
 // ====== 评论 ======
 export const addComment = (data) => request.post('/api/comment', data)
-export const getCommentList = (targetId, params) => request.get(`/api/comment/list/${targetId}`, { params })
+export const getCommentList = (targetId, params = {}) => request.get(`/api/comment/list/${targetId}`, { params: { targetType: 'CAMPAIGN', ...params } })
 export const deleteComment = (commentId) => request.delete(`/api/comment/${commentId}`)
 
 // ====== 通知 ======
@@ -81,3 +80,7 @@ export const getMyProfile = () => request.get('/api/user/profile/mine')
 export const getAdsByPosition = (code) => request.get(`/api/ad/position/${code}`)
 export const recordAdImpression = (adId) => request.post(`/api/ad/${adId}/impression`)
 export const recordAdClick = (adId) => request.post(`/api/ad/${adId}/click`)
+
+// ====== 文件上传 ======
+export const uploadFile = (formData) => request.post('/api/file/upload', formData, { headers: { 'Content-Type': 'multipart/form-data' }, showLoading: true })
+export const uploadFiles = (formData) => request.post('/api/file/upload/batch', formData, { headers: { 'Content-Type': 'multipart/form-data' }, showLoading: true })
